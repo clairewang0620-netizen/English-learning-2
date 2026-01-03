@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { 
   BookOpen, 
@@ -8,7 +8,6 @@ import {
   Volume2, 
   ChevronRight, 
   ChevronLeft, 
-  Plus, 
   X, 
   CheckCircle2, 
   AlertCircle,
@@ -16,13 +15,11 @@ import {
   EyeOff,
   Mic,
   Play,
-  RotateCcw,
   Search,
   Loader2
 } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
 
-// --- Types & Constants ---
+// --- Types ---
 
 interface Example {
   en: string;
@@ -30,10 +27,9 @@ interface Example {
 }
 
 interface Word {
-  id: string;
   word: string;
   ipa: string;
-  definition: string;
+  meaning: string;
   examples: Example[];
 }
 
@@ -50,8 +46,8 @@ interface ReadingParagraph {
 
 interface Keyword {
   word: string;
-  definition: string;
   ipa: string;
+  definition: string;
 }
 
 interface Article {
@@ -67,7 +63,6 @@ type Module = 'vocabulary' | 'dictation' | 'reading';
 
 class AudioManager {
   private static instance: AudioManager;
-  private currentUtterance: SpeechSynthesisUtterance | null = null;
   private synth: SpeechSynthesis;
 
   private constructor() {
@@ -83,7 +78,6 @@ class AudioManager {
 
   stop() {
     this.synth.cancel();
-    this.currentUtterance = null;
   }
 
   speak(text: string, lang: 'en-US' | 'zh-CN' = 'en-US') {
@@ -91,99 +85,11 @@ class AudioManager {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
     utterance.rate = 0.9;
-    this.currentUtterance = utterance;
     this.synth.speak(utterance);
   }
 }
 
 const audioManager = AudioManager.getInstance();
-
-// --- Gemini Service ---
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
-const VOCAB_PROMPT = `Generate exactly 20 unique English vocabulary words suitable for CET-4/6 and Business English levels. 
-Each word must be its lemma (base form). 
-For each word, provide:
-1. The English word.
-2. IPA phonetic transcription.
-3. Accurate Chinese meaning (real translation, no explanations like "this word means...").
-4. Exactly 2 natural usage example sentences (Business/Daily/News context). 
-   - Forbidden: Explaining the word itself (e.g., do not say "The word X is important").
-   - Each example must have an English sentence and its Chinese translation.
-DO NOT use placeholders like "Key Term", "Dimension", or meta-commentary.
-Output ONLY JSON in the requested format.`;
-
-const READING_PROMPT = `Generate a high-quality "Selected Reading" article in the style of The Economist or TIME.
-Topic should be related to technology, economy, or culture.
-Structure:
-- Title
-- 4 to 6 paragraphs.
-- Each paragraph must have an English version and a precise Chinese translation.
-- Extract 8-10 keywords/phrases from the article with their IPA and Chinese meaning.
-Words in this article and keywords MUST be unique and not repeat common vocabulary words.
-Output ONLY JSON.`;
-
-const vocabSchema = {
-  type: Type.OBJECT,
-  properties: {
-    words: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          word: { type: Type.STRING },
-          ipa: { type: Type.STRING },
-          definition: { type: Type.STRING },
-          examples: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                en: { type: Type.STRING },
-                zh: { type: Type.STRING }
-              },
-              required: ['en', 'zh']
-            }
-          }
-        },
-        required: ['word', 'ipa', 'definition', 'examples']
-      }
-    }
-  },
-  required: ['words']
-};
-
-const articleSchema = {
-  type: Type.OBJECT,
-  properties: {
-    title: { type: Type.STRING },
-    paragraphs: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          en: { type: Type.STRING },
-          zh: { type: Type.STRING }
-        },
-        required: ['en', 'zh']
-      }
-    },
-    keywords: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          word: { type: Type.STRING },
-          ipa: { type: Type.STRING },
-          definition: { type: Type.STRING }
-        },
-        required: ['word', 'ipa', 'definition']
-      }
-    }
-  },
-  required: ['title', 'paragraphs', 'keywords']
-};
 
 // --- Main Application Component ---
 
@@ -192,81 +98,43 @@ const App = () => {
   const [vocabGroups, setVocabGroups] = useState<VocabularyGroup[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [wrongWords, setWrongWords] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
-  // Initialize data
+  // Load static data from JSON files
   useEffect(() => {
-    const savedVocab = localStorage.getItem('lingomaster_vocab');
-    const savedWrong = localStorage.getItem('lingomaster_wrong');
-    const savedArticles = localStorage.getItem('lingomaster_articles');
+    const loadData = async () => {
+      try {
+        const [vocabRes, articlesRes] = await Promise.all([
+          fetch('vocabulary.json'),
+          fetch('reading.json')
+        ]);
+        
+        const vocabData = await vocabRes.json();
+        const articlesData = await articlesRes.json();
+        
+        setVocabGroups(vocabData.groups);
+        setArticles(articlesData);
 
-    if (savedVocab) setVocabGroups(JSON.parse(savedVocab));
-    if (savedWrong) setWrongWords(new Set(JSON.parse(savedWrong)));
-    if (savedArticles) setArticles(JSON.parse(savedArticles));
-    
-    setInitialized(true);
+        const savedWrong = localStorage.getItem('lingomaster_wrong');
+        if (savedWrong) setWrongWords(new Set(JSON.parse(savedWrong)));
+        
+        setInitialized(true);
+      } catch (error) {
+        console.error("Failed to load static data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
+  // Sync state to local storage
   useEffect(() => {
     if (!initialized) return;
-    localStorage.setItem('lingomaster_vocab', JSON.stringify(vocabGroups));
     localStorage.setItem('lingomaster_wrong', JSON.stringify(Array.from(wrongWords)));
-    localStorage.setItem('lingomaster_articles', JSON.stringify(articles));
-  }, [vocabGroups, wrongWords, articles, initialized]);
-
-  const generateVocabGroup = async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: [{ parts: [{ text: VOCAB_PROMPT }] }],
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: vocabSchema
-        }
-      });
-      
-      const data = JSON.parse(response.text);
-      const newGroup: VocabularyGroup = {
-        id: vocabGroups.length + 1,
-        name: `GROUP ${vocabGroups.length + 1}`,
-        words: data.words.map((w: any, idx: number) => ({ ...w, id: `${vocabGroups.length + 1}-${idx}` }))
-      };
-
-      setVocabGroups(prev => [...prev, newGroup]);
-    } catch (error) {
-      console.error("Failed to generate vocab:", error);
-      alert("Error generating content. Please check your network or API key.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const generateArticle = async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: [{ parts: [{ text: READING_PROMPT }] }],
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: articleSchema
-        }
-      });
-      
-      const data = JSON.parse(response.text);
-      const newArticle: Article = { ...data, id: Date.now().toString() };
-      setArticles(prev => [newArticle, ...prev]);
-    } catch (error) {
-      console.error("Failed to generate article:", error);
-      alert("Error generating content.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [wrongWords, initialized]);
 
   const toggleWrongWord = (word: string) => {
     setWrongWords(prev => {
@@ -277,6 +145,15 @@ const App = () => {
     });
   };
 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-slate-50 flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-emerald-600 animate-spin mb-4" />
+        <p className="text-xl font-bold text-slate-800 tracking-tight">Loading Courseware...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen max-w-5xl mx-auto px-4 py-6">
       <header className="flex justify-between items-center mb-8">
@@ -284,29 +161,7 @@ const App = () => {
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
             Lingo<span className="text-emerald-600">Master</span>
           </h1>
-          <p className="text-slate-500 text-sm font-medium">Advanced English Learning Platform</p>
-        </div>
-        <div className="flex gap-2">
-          {activeModule === 'vocabulary' && (
-            <button 
-              onClick={generateVocabGroup}
-              disabled={loading}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-sm disabled:opacity-50"
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-              New Group
-            </button>
-          )}
-          {activeModule === 'reading' && (
-            <button 
-              onClick={generateArticle}
-              disabled={loading}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-sm disabled:opacity-50"
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-              Fetch Article
-            </button>
-          )}
+          <p className="text-slate-500 text-sm font-medium">Production English Learning Platform</p>
         </div>
       </header>
 
@@ -342,14 +197,6 @@ const App = () => {
           <ReadingModule articles={articles} />
         )}
       </main>
-      
-      {loading && !vocabGroups.length && !articles.length && (
-        <div className="fixed inset-0 glass z-50 flex flex-col items-center justify-center">
-          <Loader2 className="w-12 h-12 text-emerald-600 animate-spin mb-4" />
-          <p className="text-xl font-bold text-slate-800">Generating Content...</p>
-          <p className="text-slate-500">Crafting high-quality learning material with AI</p>
-        </div>
-      )}
     </div>
   );
 };
@@ -358,8 +205,6 @@ const App = () => {
 
 const VocabularyModule = ({ groups, toggleWrongWord, wrongWords }: { groups: VocabularyGroup[], toggleWrongWord: (w: string) => void, wrongWords: Set<string> }) => {
   const [selectedWord, setSelectedWord] = useState<Word | null>(null);
-
-  if (groups.length === 0) return <EmptyState type="vocabulary" />;
 
   return (
     <div className="animate-fade-in space-y-12 pb-20">
@@ -370,9 +215,9 @@ const VocabularyModule = ({ groups, toggleWrongWord, wrongWords }: { groups: Voc
             {group.name}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {group.words.map((word) => (
+            {group.words.map((word, idx) => (
               <div 
-                key={word.id}
+                key={`${group.id}-${idx}`}
                 onClick={() => setSelectedWord(word)}
                 className="group relative bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer"
               >
@@ -389,14 +234,13 @@ const VocabularyModule = ({ groups, toggleWrongWord, wrongWords }: { groups: Voc
                   </button>
                 </div>
                 <p className="text-slate-400 font-mono text-sm mb-2">{word.ipa}</p>
-                <p className="text-slate-600 font-medium">{word.definition}</p>
+                <p className="text-slate-600 font-medium">{word.meaning}</p>
               </div>
             ))}
           </div>
         </section>
       ))}
 
-      {/* Detail Overlay */}
       {selectedWord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setSelectedWord(null)} />
@@ -422,7 +266,7 @@ const VocabularyModule = ({ groups, toggleWrongWord, wrongWords }: { groups: Voc
               
               <div className="mb-8">
                 <p className="text-sm uppercase tracking-wider text-slate-400 font-bold mb-2">Meaning</p>
-                <p className="text-2xl font-bold text-slate-800">{selectedWord.definition}</p>
+                <p className="text-2xl font-bold text-slate-800">{selectedWord.meaning}</p>
               </div>
 
               <div className="space-y-6">
@@ -441,20 +285,19 @@ const VocabularyModule = ({ groups, toggleWrongWord, wrongWords }: { groups: Voc
                 ))}
               </div>
 
-              <div className="mt-8 flex gap-3">
+              <div className="mt-8">
                 <button 
                   onClick={() => {
                     toggleWrongWord(selectedWord.word);
-                    setSelectedWord(null);
                   }}
-                  className={`flex-1 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+                  className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
                     wrongWords.has(selectedWord.word) 
-                    ? 'bg-amber-50 text-amber-600 border border-amber-200' 
+                    ? 'bg-amber-100 text-amber-700' 
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <AlertCircle className="w-5 h-5" />
-                  {wrongWords.has(selectedWord.word) ? 'In Wrong Words' : 'Add to Wrong Words'}
+                  {wrongWords.has(selectedWord.word) ? 'Remove from Wrong Words' : 'Add to Wrong Words'}
                 </button>
               </div>
             </div>
@@ -471,7 +314,6 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
   const [input, setInput] = useState('');
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [showHint, setShowHint] = useState(false);
-  const [sessionResults, setSessionResults] = useState<{word: string, correct: boolean}[]>([]);
 
   const currentWord = selectedGroup?.words[currentIndex];
 
@@ -481,10 +323,11 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
     
     const correct = input.trim().toLowerCase() === currentWord.word.toLowerCase();
     setIsCorrect(correct);
-    setSessionResults(prev => [...prev, { word: currentWord.word, correct }]);
 
     if (!correct) {
-      onToggleWrongWord(currentWord.word);
+      if (!wrongWords.has(currentWord.word)) {
+        onToggleWrongWord(currentWord.word);
+      }
     }
   };
 
@@ -503,7 +346,7 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
   if (!selectedGroup) {
     return (
       <div className="animate-fade-in space-y-6">
-        <h2 className="text-2xl font-bold text-slate-800 mb-8">Choose a session to practice</h2>
+        <h2 className="text-2xl font-bold text-slate-800 mb-8">Choose Practice Set</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {groups.map(group => (
             <button 
@@ -521,13 +364,13 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
           {wrongWords.size > 0 && (
             <button 
               onClick={() => {
-                const words = Array.from(wrongWords).map(w => {
+                const words: Word[] = [];
+                Array.from(wrongWords).forEach(w => {
                   for (const g of groups) {
                     const match = g.words.find(word => word.word === w);
-                    if (match) return match;
+                    if (match) words.push(match);
                   }
-                  return null;
-                }).filter(Boolean) as Word[];
+                });
                 setSelectedGroup({ id: 0, name: '错词集 (Wrong Words)', words });
               }}
               className="bg-amber-50 border border-amber-200 p-6 rounded-2xl text-left hover:shadow-md transition-all flex justify-between items-center group"
@@ -540,7 +383,6 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
             </button>
           )}
         </div>
-        {groups.length === 0 && <EmptyState type="dictation" />}
       </div>
     );
   }
@@ -549,7 +391,7 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
     <div className="max-w-2xl mx-auto py-12 animate-fade-in">
       <div className="flex justify-between items-center mb-8">
         <button onClick={() => setSelectedGroup(null)} className="text-slate-400 hover:text-slate-600 flex items-center gap-1 font-medium">
-          <ChevronLeft className="w-4 h-4" /> Exit
+          <ChevronLeft className="w-4 h-4" /> Exit Session
         </button>
         <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
           {currentIndex + 1} / {selectedGroup.words.length}
@@ -570,7 +412,7 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type what you hear..."
+            placeholder="Type spelling..."
             className={`w-full text-center text-3xl font-bold py-4 bg-slate-50 border-2 rounded-2xl outline-none transition-all ${
               isCorrect === true ? 'border-emerald-500 bg-emerald-50 text-emerald-700' :
               isCorrect === false ? 'border-red-500 bg-red-50 text-red-700' :
@@ -582,9 +424,9 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
           {isCorrect === null ? (
             <button 
               type="submit"
-              className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100"
+              className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-emerald-700 transition-all shadow-lg"
             >
-              Check Spelling
+              Confirm
             </button>
           ) : (
             <div className="space-y-4 animate-fade-in">
@@ -595,7 +437,7 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
               ) : (
                 <div className="space-y-2">
                   <p className="text-red-600 font-bold text-xl">Incorrect</p>
-                  <p className="text-slate-400">The correct spelling is:</p>
+                  <p className="text-slate-400">Correct spelling:</p>
                   <p className="text-3xl font-bold text-slate-800 uppercase tracking-widest">{currentWord?.word}</p>
                 </div>
               )}
@@ -603,21 +445,23 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
               <div className="grid grid-cols-2 gap-3 pt-4">
                 <button 
                   type="button"
-                  onClick={() => onToggleWrongWord(currentWord?.word || '')}
+                  onClick={() => {
+                    if (currentWord) onToggleWrongWord(currentWord.word);
+                  }}
                   className={`py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
                     wrongWords.has(currentWord?.word || '') 
                     ? 'bg-amber-100 text-amber-700' 
                     : 'bg-slate-100 text-slate-600'
                   }`}
                 >
-                  {wrongWords.has(currentWord?.word || '') ? 'In Error List' : 'Add to Errors'}
+                   {wrongWords.has(currentWord?.word || '') ? 'Remove Error' : 'Mark Error'}
                 </button>
                 <button 
                   type="button"
                   onClick={nextWord}
                   className="bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
                 >
-                  Next Word <ChevronRight className="w-4 h-4" />
+                  Next <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -629,11 +473,11 @@ const DictationModule = ({ groups, wrongWords, onToggleWrongWord }: { groups: Vo
           className="mt-10 text-slate-400 hover:text-slate-600 flex items-center gap-2 mx-auto text-sm font-semibold uppercase tracking-wider"
         >
           {showHint ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          {showHint ? 'Hide Hint' : 'Show Chinese Hint'}
+          {showHint ? 'Hide Hint' : 'Show Meaning'}
         </button>
         {showHint && (
           <p className="mt-4 text-2xl font-bold text-emerald-600 animate-fade-in">
-            {currentWord?.definition}
+            {currentWord?.meaning}
           </p>
         )}
       </div>
@@ -665,14 +509,14 @@ const ReadingModule = ({ articles }: { articles: Article[] }) => {
 
       mediaRecorder.current.onstop = () => {
         const blob = new Blob(audioChunks.current, { type: 'audio/webm' });
+        if (audioUrl) URL.revokeObjectURL(audioUrl);
         setAudioUrl(URL.createObjectURL(blob));
       };
 
       mediaRecorder.current.start();
       setRecording(idx);
-      setAudioUrl(null);
     } catch (err) {
-      alert("Microphone access denied or not available.");
+      alert("Microphone access denied.");
     }
   };
 
@@ -680,8 +524,6 @@ const ReadingModule = ({ articles }: { articles: Article[] }) => {
     mediaRecorder.current?.stop();
     setRecording(null);
   };
-
-  if (articles.length === 0) return <EmptyState type="reading" />;
 
   if (!selectedArticle) {
     return (
@@ -701,12 +543,6 @@ const ReadingModule = ({ articles }: { articles: Article[] }) => {
             <p className="text-slate-500 line-clamp-2 leading-relaxed mb-4">
               {article.paragraphs[0].en}
             </p>
-            <div className="flex gap-2">
-              {article.keywords.slice(0, 3).map((k, i) => (
-                <span key={i} className="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold">{k.word}</span>
-              ))}
-              <span className="text-slate-300 text-xs font-bold pt-1">+{article.keywords.length - 3} keywords</span>
-            </div>
           </div>
         ))}
       </div>
@@ -719,22 +555,17 @@ const ReadingModule = ({ articles }: { articles: Article[] }) => {
         onClick={() => { setSelectedArticle(null); setAudioUrl(null); }}
         className="mb-8 flex items-center gap-1 text-slate-400 hover:text-slate-600 font-bold transition-colors"
       >
-        <ChevronLeft className="w-5 h-5" /> Back to Library
+        <ChevronLeft className="w-5 h-5" /> Back to Articles
       </button>
 
-      <header className="mb-12 text-center max-w-3xl mx-auto">
+      <header className="mb-12 text-center max-w-3xl mx-auto relative">
         <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-6 leading-tight italic">
           {selectedArticle.title}
         </h2>
         <div className="flex justify-center gap-4 border-y border-slate-100 py-6">
            <div className="text-center">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Length</p>
-              <p className="text-lg font-bold text-slate-700">~5 mins</p>
-           </div>
-           <div className="w-px bg-slate-100" />
-           <div className="text-center">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Keywords</p>
-              <p className="text-lg font-bold text-slate-700">{selectedArticle.keywords.length}</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
+              <p className="text-lg font-bold text-slate-700">Production</p>
            </div>
         </div>
       </header>
@@ -794,7 +625,7 @@ const ReadingModule = ({ articles }: { articles: Article[] }) => {
         <div className="h-px bg-slate-200" />
 
         <section>
-          <h3 className="text-2xl font-bold text-slate-800 mb-8">Article Keywords</h3>
+          <h3 className="text-2xl font-bold text-slate-800 mb-8">Keywords</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {selectedArticle.keywords.map((kw, i) => (
               <div key={i} className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:border-blue-200 transition-colors">
@@ -811,18 +642,6 @@ const ReadingModule = ({ articles }: { articles: Article[] }) => {
           </div>
         </section>
       </div>
-    </div>
-  );
-};
-
-const EmptyState = ({ type }: { type: Module }) => {
-  return (
-    <div className="py-20 flex flex-col items-center text-center max-w-sm mx-auto animate-fade-in">
-      <div className="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center text-slate-300 mb-6">
-        <Search className="w-10 h-10" />
-      </div>
-      <h3 className="text-2xl font-bold text-slate-800 mb-2">Library is empty</h3>
-      <p className="text-slate-500 mb-8">Click the button in the header to generate high-quality AI content for your studies.</p>
     </div>
   );
 };

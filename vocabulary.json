@@ -1,0 +1,617 @@
+
+{
+  "groups": [
+    {
+      "id": 1,
+      "name": "GROUP 1",
+      "words": [
+        {
+          "word": "acquisition",
+          "ipa": "/ˌækwɪˈzɪʃn/",
+          "meaning": "收购；获得",
+          "examples": [
+            {
+              "en": "The company announced the acquisition of its main competitor today.",
+              "zh": "该公司今天宣布收购其主要竞争对手。"
+            },
+            {
+              "en": "Language acquisition is a natural process for young children.",
+              "zh": "语言习得对幼儿来说是一个自然的过程。"
+            }
+          ]
+        },
+        {
+          "word": "benchmark",
+          "ipa": "/ˈbentʃmɑːrk/",
+          "meaning": "基准；参照点",
+          "examples": [
+            {
+              "en": "The current profit levels will serve as a benchmark for future performance.",
+              "zh": "目前的利润水平将作为未来业绩的基准。"
+            },
+            {
+              "en": "Our customer service is seen as the benchmark for the entire industry.",
+              "zh": "我们的客户服务被视为整个行业的基准。"
+            }
+          ]
+        },
+        {
+          "word": "contingency",
+          "ipa": "/kənˈtɪndʒənsi/",
+          "meaning": "权变措施；偶发事件",
+          "examples": [
+            {
+              "en": "We must have a contingency plan in case the negotiations fail.",
+              "zh": "我们必须有一个应对谈判失败的应急计划。"
+            },
+            {
+              "en": "The budget includes a small fund for any unforeseen contingency.",
+              "zh": "预算中包括一小笔用于任何不可预见偶发事件的资金。"
+            }
+          ]
+        },
+        {
+          "word": "dividend",
+          "ipa": "/ˈdɪvɪdend/",
+          "meaning": "股息；红利",
+          "examples": [
+            {
+              "en": "The company decided to increase its annual dividend to shareholders.",
+              "zh": "公司决定增加向股东发放的年度股息。"
+            },
+            {
+              "en": "Investing in education will pay a huge dividend in the long run.",
+              "zh": "从长远来看，投资教育将带来巨大的红利。"
+            }
+          ]
+        },
+        {
+          "word": "equity",
+          "ipa": "/ˈekwəti/",
+          "meaning": "股本；公平",
+          "examples": [
+            {
+              "en": "She has built up a significant amount of equity in her home.",
+              "zh": "她已经在她的房子里积累了大量的资产净值。"
+            },
+            {
+              "en": "The firm specializes in private equity investments.",
+              "zh": "该事务所专门从事私募股权投资。"
+            }
+          ]
+        },
+        {
+          "word": "fluctuation",
+          "ipa": "/ˌflʌktʃuˈeɪʃn/",
+          "meaning": "波动；起伏",
+          "examples": [
+            {
+              "en": "Market fluctuations can affect the price of gold significantly.",
+              "zh": "市场波动会显著影响黄金价格。"
+            },
+            {
+              "en": "The constant fluctuation in temperature made everyone uncomfortable.",
+              "zh": "温度的不断波动让每个人都不舒服。"
+            }
+          ]
+        },
+        {
+          "word": "grievance",
+          "ipa": "/ˈɡriːvəns/",
+          "meaning": "不满；抱怨",
+          "examples": [
+            {
+              "en": "Employees can file a formal grievance if they feel mistreated.",
+              "zh": "如果员工觉得受了委屈，可以提出正式申诉。"
+            },
+            {
+              "en": "The committee was set up to investigate staff grievances.",
+              "zh": "委员会的成立是为了调查员工的不满。"
+            }
+          ]
+        },
+        {
+          "word": "hierarchy",
+          "ipa": "/ˈhaɪərɑːrki/",
+          "meaning": "等级制度；阶层",
+          "examples": [
+            {
+              "en": "There is a clear hierarchy within the corporate structure.",
+              "zh": "公司结构内有明确的等级制度。"
+            },
+            {
+              "en": "She quickly rose through the hierarchy of the civil service.",
+              "zh": "她很快就在公务员阶层中获得了晋升。"
+            }
+          ]
+        },
+        {
+          "word": "incentive",
+          "ipa": "/ɪnˈsentɪv/",
+          "meaning": "激励；动机",
+          "examples": [
+            {
+              "en": "The government offers tax incentives to encourage new businesses.",
+              "zh": "政府提供税收激励以鼓励新企业。"
+            },
+            {
+              "en": "Bonus payments provide a strong incentive for staff to work harder.",
+              "zh": "奖金发放为员工更努力工作提供了强有力的激励。"
+            }
+          ]
+        },
+        {
+          "word": "juncture",
+          "ipa": "/ˈdʒʌŋktʃər/",
+          "meaning": "关头；接合点",
+          "examples": [
+            {
+              "en": "At this critical juncture, we need to make a firm decision.",
+              "zh": "在这个关键时刻，我们需要做出坚定的决定。"
+            },
+            {
+              "en": "The project is at a very delicate juncture right now.",
+              "zh": "该项目目前正处于一个非常微妙的关头。"
+            }
+          ]
+        },
+        {
+          "word": "liability",
+          "ipa": "/ˌlaɪəˈbɪləti/",
+          "meaning": "债务；责任",
+          "examples": [
+            {
+              "en": "The company has over one million dollars in total liabilities.",
+              "zh": "该公司的负债总额超过一百万美元。"
+            },
+            {
+              "en": "His lack of experience proved to be a liability for the team.",
+              "zh": "事实证明，他缺乏经验成了团队的累赘。"
+            }
+          ]
+        },
+        {
+          "word": "merger",
+          "ipa": "/ˈmɜːrdʒər/",
+          "meaning": "合并；兼并",
+          "examples": [
+            {
+              "en": "The merger between the two banks was approved by regulators.",
+              "zh": "两家银行的合并已获得监管机构的批准。"
+            },
+            {
+              "en": "The staff are worried about job security following the merger.",
+              "zh": "合并后，员工们担心工作的稳定性。"
+            }
+          ]
+        },
+        {
+          "word": "negotiation",
+          "ipa": "/nɪˌɡəʊʃiˈeɪʃn/",
+          "meaning": "谈判；协商",
+          "examples": [
+            {
+              "en": "The terms of the contract are still under negotiation.",
+              "zh": "合同条款仍在谈判中。"
+            },
+            {
+              "en": "Negotiation is an essential skill for any successful business leader.",
+              "zh": "对于任何成功的商界领袖来说，谈判都是一项必不可少的技能。"
+            }
+          ]
+        },
+        {
+          "word": "outsource",
+          "ipa": "/ˈaʊtsɔːrs/",
+          "meaning": "外包",
+          "examples": [
+            {
+              "en": "Many companies outsource their customer support to specialized firms.",
+              "zh": "许多公司将客户支持外包给专业公司。"
+            },
+            {
+              "en": "We decided to outsource the web development project to save costs.",
+              "zh": "我们决定将网络开发项目外包以节省成本。"
+            }
+          ]
+        },
+        {
+          "word": "portfolio",
+          "ipa": "/pɔːrtˈfəʊliəʊ/",
+          "meaning": "投资组合；作品集",
+          "examples": [
+            {
+              "en": "He manages a diverse portfolio of international stocks.",
+              "zh": "他管理着一个多元化的国际股票投资组合。"
+            },
+            {
+              "en": "The designer presented her portfolio during the interview.",
+              "zh": "设计师在面试中展示了她的作品集。"
+            }
+          ]
+        },
+        {
+          "word": "quota",
+          "ipa": "/ˈkwəʊtə/",
+          "meaning": "配额；定额",
+          "examples": [
+            {
+              "en": "The sales team exceeded their annual quota by ten percent.",
+              "zh": "销售团队超过了年度定额的10%。"
+            },
+            {
+              "en": "Import quotas were imposed to protect the local industry.",
+              "zh": "为了保护当地产业，实行了进口配额。"
+            }
+          ]
+        },
+        {
+          "word": "revenue",
+          "ipa": "/ˈrevənjuː/",
+          "meaning": "收入；税收",
+          "examples": [
+            {
+              "en": "The company reported a record increase in quarterly revenue.",
+              "zh": "该公司报告季度收入创纪录增长。"
+            },
+            {
+              "en": "Ad revenue is the primary source of income for many websites.",
+              "zh": "广告收入是许多网站的主要收入来源。"
+            }
+          ]
+        },
+        {
+          "word": "subsidiary",
+          "ipa": "/səbˈsɪdiəri/",
+          "meaning": "子公司；附属的",
+          "examples": [
+            {
+              "en": "The multinational corporation has subsidiaries in over fifty countries.",
+              "zh": "这家跨国公司在五十多个国家设有子公司。"
+            },
+            {
+              "en": "All other issues are subsidiary to the main goal of survival.",
+              "zh": "所有其他问题与生存这一主要目标相比都是次要的。"
+            }
+          ]
+        },
+        {
+          "word": "turnover",
+          "ipa": "/ˈtɜːrnəʊvər/",
+          "meaning": "营业额；人员更替率",
+          "examples": [
+            {
+              "en": "The restaurant has a high turnover, serving hundreds of customers daily.",
+              "zh": "这家餐厅的营业额很高，每天接待数百名客户。"
+            },
+            {
+              "en": "Low employee turnover is a sign of a healthy corporate culture.",
+              "zh": "低员工流动率是健康企业文化的标志。"
+            }
+          ]
+        },
+        {
+          "word": "uniform",
+          "ipa": "/ˈjuːnɪfɔːrm/",
+          "meaning": "制服；统一的",
+          "examples": [
+            {
+              "en": "All staff members are required to wear a uniform at work.",
+              "zh": "所有员工在工作中都必须穿制服。"
+            },
+            {
+              "en": "The buildings are of a uniform height and design.",
+              "zh": "这些建筑的高度和设计都是统一的。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "GROUP 2",
+      "words": [
+        {
+          "word": "affiliate",
+          "ipa": "/əˈfɪlieɪt/",
+          "meaning": "子公司；附属机构",
+          "examples": [
+            {
+              "en": "The university has several research affiliates across Europe.",
+              "zh": "这所大学在欧洲各地有几个研究附属机构。"
+            },
+            {
+              "en": "He decided to affiliate his local club with the national organization.",
+              "zh": "他决定将他的地方俱乐部并入国家组织。"
+            }
+          ]
+        },
+        {
+          "word": "breach",
+          "ipa": "/briːtʃ/",
+          "meaning": "违约；裂缝",
+          "examples": [
+            {
+              "en": "The company was sued for a breach of contract.",
+              "zh": "该公司因违约被起诉。"
+            },
+            {
+              "en": "There was a security breach at the main server room.",
+              "zh": "主服务器机房发生了安全违规事件。"
+            }
+          ]
+        },
+        {
+          "word": "commission",
+          "ipa": "/kəˈmɪʃn/",
+          "meaning": "委员会；佣金",
+          "examples": [
+            {
+              "en": "The salesperson earns a ten percent commission on every deal.",
+              "zh": "销售员在每笔交易中赚取10%的佣金。"
+            },
+            {
+              "en": "A special commission was formed to investigate the incident.",
+              "zh": "成立了一个特别委员会来调查这一事件。"
+            }
+          ]
+        },
+        {
+          "word": "deficit",
+          "ipa": "/ˈdefɪsɪt/",
+          "meaning": "赤字；亏损",
+          "examples": [
+            {
+              "en": "The government is struggling to reduce the national budget deficit.",
+              "zh": "政府正努力减少国家预算赤字。"
+            },
+            {
+              "en": "There is a significant deficit of skilled workers in the tech sector.",
+              "zh": "科技行业熟练工人的缺口很大。"
+            }
+          ]
+        },
+        {
+          "word": "endorsement",
+          "ipa": "/ɪnˈdɔːrsmənt/",
+          "meaning": "背书；赞同",
+          "examples": [
+            {
+              "en": "The celebrity's endorsement helped boost the brand's sales.",
+              "zh": "这位名人的代言帮助提升了品牌的销售额。"
+            },
+            {
+              "en": "The policy received a strong endorsement from the board of directors.",
+              "zh": "该政策得到了董事会的强烈赞同。"
+            }
+          ]
+        },
+        {
+          "word": "forecast",
+          "ipa": "/ˈfɔːrkæst/",
+          "meaning": "预测；预报",
+          "examples": [
+            {
+              "en": "The economic forecast suggests a slow recovery for next year.",
+              "zh": "经济预测表明明年将缓慢复苏。"
+            },
+            {
+              "en": "Meteorologists forecast heavy rain for the weekend.",
+              "zh": "气象学家预报周末有大雨。"
+            }
+          ]
+        },
+        {
+          "word": "guarantor",
+          "ipa": "/ˌɡærənˈtɔːr/",
+          "meaning": "担保人",
+          "examples": [
+            {
+              "en": "His father acted as a guarantor for his student loan.",
+              "zh": "他的父亲担任了他的学生贷款担保人。"
+            },
+            {
+              "en": "A guarantor is legally responsible for the debt if the borrower fails to pay.",
+              "zh": "如果借款人未支付，担保人将在法律上对债务负责。"
+            }
+          ]
+        },
+        {
+          "word": "infrastructure",
+          "ipa": "/ˈɪnfrəstrʌktʃər/",
+          "meaning": "基础设施",
+          "examples": [
+            {
+              "en": "Investment in transport infrastructure is essential for economic growth.",
+              "zh": "交通基础设施投资对经济增长至关重要。"
+            },
+            {
+              "en": "The city needs to upgrade its aging water infrastructure.",
+              "zh": "这座城市需要升级其老化的供水基础设施。"
+            }
+          ]
+        },
+        {
+          "word": "jeopardize",
+          "ipa": "/ˈdʒepərdaɪz/",
+          "meaning": "危害；使受险",
+          "examples": [
+            {
+              "en": "The scandal could jeopardize the politician's career.",
+              "zh": "这桩丑闻可能会危及这位政治家的职业生涯。"
+            },
+            {
+              "en": "Bad weather might jeopardize our plans for the outdoor event.",
+              "zh": "恶劣的天气可能会危及我们户外活动的计划。"
+            }
+          ]
+        },
+        {
+          "word": "liquidate",
+          "ipa": "/ˈlɪkwɪdeɪt/",
+          "meaning": "清算；变现",
+          "examples": [
+            {
+              "en": "The company was forced to liquidate its assets to pay creditors.",
+              "zh": "该公司被迫变现资产以支付债权人。"
+            },
+            {
+              "en": "Investors may choose to liquidate their positions during a market crash.",
+              "zh": "投资者可能会在市场崩盘期间选择清仓。"
+            }
+          ]
+        },
+        {
+          "word": "monopoly",
+          "ipa": "/məˈnɒpəli/",
+          "meaning": "垄断",
+          "examples": [
+            {
+              "en": "The government is trying to break up the telecommunications monopoly.",
+              "zh": "政府正试图打破电信垄断。"
+            },
+            {
+              "en": "Having a monopoly allows a company to set higher prices.",
+              "zh": "拥有垄断地位使公司能够设定更高的价格。"
+            }
+          ]
+        },
+        {
+          "word": "nominee",
+          "ipa": "/ˌnɒmɪˈniː/",
+          "meaning": "被提名者",
+          "examples": [
+            {
+              "en": "The board has announced its official nominee for the CEO position.",
+              "zh": "董事会已经宣布了首席执行官职位的正式提名人。"
+            },
+            {
+              "en": "Award nominees will be revealed during the ceremony.",
+              "zh": "奖项提名人将在仪式期间揭晓。"
+            }
+          ]
+        },
+        {
+          "word": "overhaul",
+          "ipa": "/ˌəʊvəˈhɔːl/",
+          "meaning": "彻底检修；改革",
+          "examples": [
+            {
+              "en": "The education system needs a complete overhaul to meet modern needs.",
+              "zh": "教育系统需要彻底改革以满足现代需求。"
+            },
+            {
+              "en": "They decided to overhaul the machinery during the holiday break.",
+              "zh": "他们决定在假期休整期间对机器进行全面检修。"
+            }
+          ]
+        },
+        {
+          "word": "redundancy",
+          "ipa": "/rɪˈdʌndənsi/",
+          "meaning": "裁员；多余",
+          "examples": [
+            {
+              "en": "The factory closure resulted in several hundred redundancies.",
+              "zh": "工厂关闭导致数百人被裁员。"
+            },
+            {
+              "en": "The system has built-in redundancy to prevent total failure.",
+              "zh": "该系统具有内置冗余以防止全面故障。"
+            }
+          ]
+        },
+        {
+          "word": "solvency",
+          "ipa": "/ˈsɒlvənsi/",
+          "meaning": "偿付能力",
+          "examples": [
+            {
+              "en": "The audit confirmed the company's long-term solvency.",
+              "zh": "审计确认了公司的长期偿付能力。"
+            },
+            {
+              "en": "Bank regulators monitor the solvency of financial institutions.",
+              "zh": "银行监管机构监控金融机构的偿付能力。"
+            }
+          ]
+        },
+        {
+          "word": "underwrite",
+          "ipa": "/ˈʌndərraɪt/",
+          "meaning": "承销；保险",
+          "examples": [
+            {
+              "en": "The bank agreed to underwrite the new stock offering.",
+              "zh": "银行同意承销新发行的股票。"
+            },
+            {
+              "en": "Insurance companies underwrite risks associated with natural disasters.",
+              "zh": "保险公司承保与自然灾害相关的风险。"
+            }
+          ]
+        },
+        {
+          "word": "variance",
+          "ipa": "/ˈveəriəns/",
+          "meaning": "差异；方差",
+          "examples": [
+            {
+              "en": "There is a significant variance in the test results across different groups.",
+              "zh": "不同组之间的测试结果存在显著差异。"
+            },
+            {
+              "en": "He requested a variance from the local zoning laws.",
+              "zh": "他申请了当地分区法的变更许可。"
+            }
+          ]
+        },
+        {
+          "word": "wholesale",
+          "ipa": "/ˈhəʊlseɪl/",
+          "meaning": "批发；大规模的",
+          "examples": [
+            {
+              "en": "We buy our supplies at wholesale prices to save money.",
+              "zh": "我们以批发价购买供应品以省钱。"
+            },
+            {
+              "en": "The company underwent wholesale changes in its management team.",
+              "zh": "公司管理团队经历了大规模的人事变动。"
+            }
+          ]
+        },
+        {
+          "word": "yield",
+          "ipa": "/jiːld/",
+          "meaning": "产量；收益率",
+          "examples": [
+            {
+              "en": "The new farming techniques have significantly increased the crop yield.",
+              "zh": "新的耕作技术显著提高了农作物产量。"
+            },
+            {
+              "en": "The bond offers a high annual yield to investors.",
+              "zh": "该债券向投资者提供高额的年度收益率。"
+            }
+          ]
+        },
+        {
+          "word": "stagnation",
+          "ipa": "/stæɡˈneɪʃn/",
+          "meaning": "停滞；不景气",
+          "examples": [
+            {
+              "en": "The economy has suffered from a long period of stagnation.",
+              "zh": "经济遭受了长期的停滞。"
+            },
+            {
+              "en": "Lack of innovation can lead to career stagnation for engineers.",
+              "zh": "缺乏创新会导致工程师的职业生涯停滞。"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
