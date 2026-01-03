@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { 
   BookOpen, 
@@ -20,7 +20,10 @@ import {
   Check,
   Trophy,
   Sparkles,
-  Trash2
+  ThumbsUp,
+  Filter,
+  LayoutGrid,
+  List as ListIcon
 } from 'lucide-react';
 
 // Import data directly
@@ -38,6 +41,7 @@ interface Word {
   word: string;
   ipa: string;
   meaning: string;
+  category: string;
   examples: Example[];
 }
 
@@ -61,9 +65,20 @@ type Module = 'vocabulary' | 'dictation' | 'reading';
 class AudioManager {
   private static instance: AudioManager;
   private synth: SpeechSynthesis;
+  private voice: SpeechSynthesisVoice | null = null;
 
   private constructor() {
     this.synth = window.speechSynthesis;
+    // Try to pre-load a high-quality American voice
+    const loadVoices = () => {
+      const voices = this.synth.getVoices();
+      // Prioritize natural sounding American English voices
+      this.voice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha') || (v.lang === 'en-US' && v.localService)) || null;
+    };
+    loadVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
   }
 
   static getInstance() {
@@ -80,9 +95,14 @@ class AudioManager {
   speak(text: string, lang: 'en-US' | 'zh-CN' = 'en-US') {
     this.stop();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
+    if (lang === 'en-US' && this.voice) {
+      utterance.voice = this.voice;
+    } else {
+      utterance.lang = lang;
+    }
+    utterance.rate = 0.88; // Slightly slower for better clarity and natural flow
+    utterance.pitch = 1.05; // Slightly higher pitch for a clearer American tone
+    utterance.volume = 1;
     this.synth.speak(utterance);
   }
 }
@@ -212,20 +232,60 @@ const VocabularyModule = ({
   groups: VocabularyGroup[], intensiveWords: Set<string>, masteredWords: Set<string>,
   onToggleIntensive: (w: string) => void, onToggleMastered: (w: string) => void
 }) => {
-  const [selectedGroup, setSelectedGroup] = useState<VocabularyGroup | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [cardIndex, setCardIndex] = useState<number | null>(null);
 
-  const currentWord = (selectedGroup && cardIndex !== null) ? selectedGroup.words[cardIndex] : null;
+  // Derive visible words based on filter
+  const visibleWords = useMemo(() => {
+    if (selectedCategory) {
+      const filtered: Word[] = [];
+      groups.forEach(g => g.words.forEach(w => {
+        if (w.category === selectedCategory) filtered.push(w);
+      }));
+      return filtered;
+    }
+    const all: Word[] = [];
+    groups.forEach(g => all.push(...g.words));
+    return all;
+  }, [groups, selectedCategory]);
+
+  const currentWord = cardIndex !== null ? visibleWords[cardIndex] : null;
 
   const navigateCard = (direction: number) => {
-    if (selectedGroup && cardIndex !== null) {
+    if (cardIndex !== null) {
       const nextIndex = cardIndex + direction;
-      if (nextIndex >= 0 && nextIndex < selectedGroup.words.length) {
+      if (nextIndex >= 0 && nextIndex < visibleWords.length) {
         setCardIndex(nextIndex);
-        audioManager.speak(selectedGroup.words[nextIndex].word);
+        audioManager.speak(visibleWords[nextIndex].word);
       }
     }
   };
+
+  const WordRow = ({ word, onClick }: { word: Word, onClick: () => void }) => (
+    <div 
+      className="group bg-white border-2 border-slate-50 p-6 rounded-[2rem] flex items-center justify-between hover:shadow-2xl hover:border-emerald-100 transition-all cursor-pointer relative"
+      onClick={onClick}
+    >
+      <div className="flex-1">
+        <div className="flex items-center gap-3">
+          <h3 className="text-2xl font-black text-slate-800 tracking-tight">{word.word}</h3>
+          <span className="text-emerald-500 font-mono text-sm font-bold">{word.ipa}</span>
+        </div>
+        <p className="text-slate-500 font-bold mt-1 text-sm">{word.meaning}</p>
+      </div>
+      <div className="flex items-center gap-4">
+        {masteredWords.has(word.word) && <Check className="w-5 h-5 text-emerald-500 bg-emerald-50 rounded-full p-1" />}
+        {intensiveWords.has(word.word) && <Star className="w-5 h-5 text-amber-500 fill-amber-500 bg-amber-50 rounded-full p-1" />}
+        <button 
+          onClick={(e) => { e.stopPropagation(); audioManager.speak(word.word); }}
+          className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+        >
+          <Volume2 className="w-5 h-5" />
+        </button>
+        <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors" />
+      </div>
+    </div>
+  );
 
   if (cardIndex !== null && currentWord) {
     return (
@@ -242,6 +302,9 @@ const VocabularyModule = ({
           <div className="overflow-y-auto p-8 md:p-12">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-10">
               <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">{currentWord.category}</span>
+                </div>
                 <h2 className="text-5xl font-black text-slate-900 tracking-tighter mb-2">{currentWord.word}</h2>
                 <p className="text-2xl text-emerald-600 font-mono font-medium">{currentWord.ipa}</p>
               </div>
@@ -261,14 +324,14 @@ const VocabularyModule = ({
             <div className="space-y-8">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-black">Contextual Usage</p>
               {currentWord.examples.map((ex, i) => (
-                <div key={i} className="bg-slate-50 p-6 md:p-8 rounded-[2rem] relative group border border-slate-100">
-                  <p className="text-slate-800 font-bold text-xl mb-4 leading-relaxed">{ex.en}</p>
-                  <p className="text-slate-500 text-lg font-medium">{ex.zh}</p>
+                <div key={i} className="bg-slate-50 p-8 md:p-10 rounded-[2.5rem] relative group border border-slate-100">
+                  <p className="text-slate-800 font-serif italic text-2xl mb-5 leading-relaxed tracking-tight">{ex.en}</p>
+                  <p className="text-slate-500 text-lg font-medium border-l-4 border-emerald-400 pl-4">{ex.zh}</p>
                   <button 
                     onClick={() => audioManager.speak(ex.en)}
-                    className="absolute bottom-6 right-6 p-3 bg-white text-emerald-500 shadow-sm rounded-full opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
+                    className="absolute bottom-8 right-8 p-4 bg-white text-emerald-500 shadow-md rounded-full opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
                   >
-                    <Volume2 className="w-5 h-5" />
+                    <Volume2 className="w-6 h-6" />
                   </button>
                 </div>
               ))}
@@ -278,7 +341,7 @@ const VocabularyModule = ({
               <button 
                 onClick={() => onToggleIntensive(currentWord.word)}
                 className={`flex-1 py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 ${
-                  intensiveWords.has(currentWord.word) ? 'bg-amber-100 text-amber-700 border-amber-200 border-2' : 'bg-slate-100 text-slate-700'
+                  intensiveWords.has(currentWord.word) ? 'bg-amber-100 text-amber-700 border-amber-200 border-2' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 <Star className={`w-6 h-6 ${intensiveWords.has(currentWord.word) ? 'fill-current text-amber-500' : ''}`} />
@@ -287,7 +350,7 @@ const VocabularyModule = ({
               <button 
                 onClick={() => onToggleMastered(currentWord.word)}
                 className={`flex-1 py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 ${
-                  masteredWords.has(currentWord.word) ? 'bg-emerald-100 text-emerald-700 border-emerald-200 border-2' : 'bg-slate-100 text-slate-700'
+                  masteredWords.has(currentWord.word) ? 'bg-emerald-100 text-emerald-700 border-emerald-200 border-2' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 <Check className="w-6 h-6" />
@@ -303,9 +366,9 @@ const VocabularyModule = ({
               >
                 <ChevronLeft className="w-5 h-5" /> Prev
               </button>
-              <span className="font-black text-slate-300 tracking-tighter text-sm uppercase">{selectedGroup?.name} | {cardIndex + 1} OF {selectedGroup?.words.length}</span>
+              <span className="font-black text-slate-300 tracking-tighter text-sm uppercase">INDEX: {cardIndex + 1} / {visibleWords.length}</span>
               <button 
-                disabled={cardIndex === (selectedGroup?.words.length || 0) - 1}
+                disabled={cardIndex === visibleWords.length - 1}
                 onClick={() => navigateCard(1)}
                 className="flex items-center gap-2 font-black text-xs uppercase tracking-widest text-slate-400 hover:text-slate-900 disabled:opacity-20"
               >
@@ -318,64 +381,70 @@ const VocabularyModule = ({
     );
   }
 
-  if (selectedGroup) {
-    return (
-      <div className="animate-fade-in">
-        <button 
-          onClick={() => setSelectedGroup(null)}
-          className="mb-8 flex items-center gap-2 text-slate-400 hover:text-slate-900 font-black uppercase tracking-widest text-[11px]"
-        >
-          <ChevronLeft className="w-5 h-5" /> Back to Groups
-        </button>
-        <div className="flex items-center gap-3 mb-10">
-          <h2 className="text-4xl font-black text-emerald-600 italic tracking-tighter">{selectedGroup.name}</h2>
-          <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest">{selectedGroup.words.length} Units</span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {selectedGroup.words.map((word, idx) => (
-            <div 
-              key={idx}
-              onClick={() => { setCardIndex(idx); audioManager.speak(word.word); }}
-              className="group bg-white border-2 border-slate-50 p-6 rounded-[2rem] flex items-center justify-between hover:shadow-2xl hover:border-emerald-100 transition-all cursor-pointer relative overflow-hidden"
+  return (
+    <div className="animate-fade-in space-y-10">
+      {/* Category Filters */}
+      <section>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-black text-slate-900 tracking-tighter flex items-center gap-2 italic">
+            <Filter className="w-6 h-6 text-emerald-600" />
+            Lexicon Filtering
+          </h2>
+          {selectedCategory && (
+            <button 
+              onClick={() => setSelectedCategory(null)}
+              className="text-xs font-black text-slate-400 hover:text-slate-900 uppercase tracking-widest flex items-center gap-1"
             >
-              <div className="flex-1">
-                <div className="flex items-center gap-4">
-                  <h3 className="text-2xl font-black text-slate-800 tracking-tight">{word.word}</h3>
-                  <span className="text-emerald-500 font-mono text-sm font-bold">{word.ipa}</span>
-                </div>
-                <p className="text-slate-500 font-bold mt-1 text-sm">{word.meaning}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                {masteredWords.has(word.word) && <Check className="w-5 h-5 text-emerald-500 bg-emerald-50 rounded-full p-1" />}
-                {intensiveWords.has(word.word) && <Star className="w-5 h-5 text-amber-500 fill-amber-500 bg-amber-50 rounded-full p-1" />}
-                <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors" />
-              </div>
-            </div>
+              <X className="w-3 h-3" /> Clear Filters
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {['CET-4', 'CET-6', 'TEM-8', 'Business', 'Emotions', 'Daily'].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+              className={`px-6 py-3 rounded-2xl font-black text-sm transition-all border-2 ${
+                selectedCategory === cat 
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-200 transform scale-105' 
+                : 'bg-white text-slate-600 border-slate-100 hover:border-emerald-400'
+              }`}
+            >
+              {cat === 'Business' ? '商务英语' : 
+               cat === 'Emotions' ? '情绪表达' : 
+               cat === 'Daily' ? '日常用语' : cat}
+            </button>
           ))}
         </div>
-      </div>
-    );
-  }
+      </section>
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
-      {groups.map((group) => (
-        <button 
-          key={group.id}
-          onClick={() => setSelectedGroup(group)}
-          className="bg-white border-4 border-slate-50 p-10 rounded-[3.5rem] text-left hover:border-emerald-400 hover:shadow-[0_20px_50px_rgba(16,185,129,0.1)] transition-all flex flex-col group relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform"></div>
-          <p className="text-xs font-black text-emerald-500 uppercase tracking-[0.3em] mb-4">Educational Unit</p>
-          <h3 className="text-3xl font-black text-slate-800 tracking-tighter mb-8 italic">{group.name}</h3>
-          <div className="mt-auto flex justify-between items-center w-full">
-            <span className="text-slate-400 font-bold uppercase tracking-widest text-[11px]">{group.words.length} Vocabulary Units</span>
-            <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-200">
-              <ChevronRight className="w-6 h-6" />
-            </div>
+      {/* Main List Display */}
+      <section className="space-y-12">
+        {selectedCategory ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {visibleWords.map((word, idx) => (
+              <WordRow key={idx} word={word} onClick={() => { setCardIndex(idx); audioManager.speak(word.word); }} />
+            ))}
           </div>
-        </button>
-      ))}
+        ) : (
+          groups.map((group) => (
+            <div key={group.id} className="space-y-6">
+              <div className="flex items-center gap-4 border-b-2 border-slate-100 pb-4">
+                <h3 className="text-2xl font-black text-emerald-600 italic tracking-tighter">{group.name}</h3>
+                <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">20 Units</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {group.words.map((word, idx) => {
+                  const globalIdx = groups.slice(0, group.id - 1).reduce((acc, curr) => acc + curr.words.length, 0) + idx;
+                  return (
+                    <WordRow key={idx} word={word} onClick={() => { setCardIndex(globalIdx); audioManager.speak(word.word); }} />
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        )}
+      </section>
     </div>
   );
 };
@@ -437,7 +506,7 @@ const DictationModule = ({
     });
 
     return (
-      <div className="animate-fade-in space-y-8">
+      <div className="animate-fade-in space-y-12">
         <button 
           onClick={() => setIsErrorReviewMode(false)}
           className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-black uppercase tracking-widest text-[11px] transition-colors"
@@ -450,33 +519,33 @@ const DictationModule = ({
         </div>
         <div className="space-y-4">
           {words.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-[3rem] border-2 border-slate-50">
-              <Sparkles className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-              <p className="text-slate-400 font-bold">错题集已空，太棒了！</p>
+            <div className="text-center py-20 bg-white rounded-[4rem] border-4 border-slate-50">
+              <Sparkles className="w-16 h-16 text-emerald-500 mx-auto mb-6" />
+              <p className="text-slate-400 font-black text-lg">错题集已空，太棒了！</p>
             </div>
           ) : (
             words.map((word, idx) => (
               <div 
                 key={idx}
-                className="bg-white border-2 border-slate-50 p-8 rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-xl transition-all"
+                className="bg-white border-2 border-slate-50 p-8 rounded-[3rem] flex flex-col md:flex-row md:items-center justify-between gap-8 hover:shadow-2xl transition-all"
               >
                 <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-2">
-                    <h3 className="text-3xl font-black text-slate-800 tracking-tight">{word.word}</h3>
-                    <span className="text-emerald-500 font-mono text-sm font-bold">{word.ipa}</span>
+                  <div className="flex items-center gap-4 mb-3">
+                    <h3 className="text-3xl font-black text-slate-800 tracking-tight italic">{word.word}</h3>
+                    <span className="text-emerald-500 font-mono text-base font-bold">{word.ipa}</span>
                   </div>
-                  <p className="text-slate-600 font-bold text-lg">{word.meaning}</p>
+                  <p className="text-slate-600 font-bold text-xl border-l-4 border-amber-400 pl-4">{word.meaning}</p>
                 </div>
                 <div className="flex items-center gap-4">
                   <button 
                     onClick={() => audioManager.speak(word.word)}
-                    className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                    className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-[1.5rem] flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all shadow-sm active:scale-95"
                   >
-                    <Volume2 className="w-6 h-6" />
+                    <Volume2 className="w-7 h-7" />
                   </button>
                   <button 
                     onClick={() => onRemoveWrong(word.word)}
-                    className="h-14 px-8 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-emerald-600 transition-all flex items-center gap-2"
+                    className="h-16 px-10 bg-slate-900 text-white rounded-[1.5rem] font-black text-sm uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-3 shadow-lg active:scale-95"
                   >
                     <Check className="w-5 h-5" /> 已掌握
                   </button>
@@ -526,7 +595,6 @@ const DictationModule = ({
     );
   }
 
-  // Formatting for display on error: First letter capital, rest small
   const displayFormat = currentWord ? currentWord.word.charAt(0).toUpperCase() + currentWord.word.slice(1).toLowerCase() : "";
 
   return (
@@ -596,9 +664,9 @@ const DictationModule = ({
                   <button 
                     type="button"
                     onClick={openErrorSet}
-                    className="flex items-center justify-center gap-2 text-amber-600 font-black bg-amber-50 w-fit mx-auto px-8 py-4 rounded-[1.5rem] hover:bg-amber-100 transition-all border-2 border-amber-100 shadow-sm"
+                    className="flex items-center justify-center gap-2 text-amber-600 font-black bg-amber-50 w-fit mx-auto px-10 py-5 rounded-[2rem] hover:bg-amber-100 transition-all border-2 border-amber-100 shadow-sm active:scale-95"
                   >
-                    <AlertCircle className="w-5 h-5" />
+                    <ThumbsUp className="w-6 h-6" />
                     已加入错题集
                   </button>
                 </div>
@@ -607,7 +675,7 @@ const DictationModule = ({
               <button 
                 type="button"
                 onClick={nextWord}
-                className="w-full bg-emerald-600 text-white py-6 rounded-[2.5rem] font-black text-xl hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-100"
+                className="w-full bg-emerald-600 text-white py-6 rounded-[2.5rem] font-black text-xl hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-emerald-100 active:scale-95"
               >
                 Next <ChevronRight className="w-6 h-6" />
               </button>

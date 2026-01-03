@@ -5,612 +5,156 @@ export const vocabularyData = {
       "id": 1,
       "name": "GROUP 1",
       "words": [
-        {
-          "word": "acquisition",
-          "ipa": "/ˌækwɪˈzɪʃn/",
-          "meaning": "收购；获得",
-          "examples": [
-            {
-              "en": "The company announced the acquisition of its main competitor today.",
-              "zh": "该公司今天宣布收购其主要竞争对手。"
-            },
-            {
-              "en": "Language acquisition is a natural process for young children.",
-              "zh": "语言习得对幼儿来说是一个自然的过程。"
-            }
-          ]
-        },
-        {
-          "word": "benchmark",
-          "ipa": "/ˈbentʃmɑːrk/",
-          "meaning": "基准；参照点",
-          "examples": [
-            {
-              "en": "The current profit levels will serve as a benchmark for future performance.",
-              "zh": "目前的利润水平将作为未来业绩的基准。"
-            },
-            {
-              "en": "Our customer service is seen as the benchmark for the entire industry.",
-              "zh": "我们的客户服务被视为整个行业的基准。"
-            }
-          ]
-        },
-        {
-          "word": "contingency",
-          "ipa": "/kənˈtɪndʒənsi/",
-          "meaning": "权变措施；偶发事件",
-          "examples": [
-            {
-              "en": "We must have a contingency plan in case the negotiations fail.",
-              "zh": "我们必须有一个应对谈判失败的应急计划。"
-            },
-            {
-              "en": "The budget includes a small fund for any unforeseen contingency.",
-              "zh": "预算中包括一小笔用于任何不可预见偶发事件的资金。"
-            }
-          ]
-        },
-        {
-          "word": "dividend",
-          "ipa": "/ˈdɪvɪdend/",
-          "meaning": "股息；红利",
-          "examples": [
-            {
-              "en": "The company decided to increase its annual dividend to shareholders.",
-              "zh": "公司决定增加向股东发放的年度股息。"
-            },
-            {
-              "en": "Investing in education will pay a huge dividend in the long run.",
-              "zh": "从长远来看，投资教育将带来巨大的红利。"
-            }
-          ]
-        },
-        {
-          "word": "equity",
-          "ipa": "/ˈekwəti/",
-          "meaning": "股本；公平",
-          "examples": [
-            {
-              "en": "She has built up a significant amount of equity in her home.",
-              "zh": "她已经在她的房子里积累了大量的资产净值。"
-            },
-            {
-              "en": "The firm specializes in private equity investments.",
-              "zh": "该事务所专门从事私募股权投资。"
-            }
-          ]
-        },
-        {
-          "word": "fluctuation",
-          "ipa": "/ˌflʌktʃuˈeɪʃn/",
-          "meaning": "波动；起伏",
-          "examples": [
-            {
-              "en": "Market fluctuations can affect the price of gold significantly.",
-              "zh": "市场波动会显著影响黄金价格。"
-            },
-            {
-              "en": "The constant fluctuation in temperature made everyone uncomfortable.",
-              "zh": "温度的不断波动让每个人都不舒服。"
-            }
-          ]
-        },
-        {
-          "word": "grievance",
-          "ipa": "/ˈɡriːvəns/",
-          "meaning": "不满；抱怨",
-          "examples": [
-            {
-              "en": "Employees can file a formal grievance if they feel mistreated.",
-              "zh": "如果员工觉得受了委屈，可以提出正式申诉。"
-            },
-            {
-              "en": "The committee was set up to investigate staff grievances.",
-              "zh": "委员会的成立是为了调查员工的不满。"
-            }
-          ]
-        },
-        {
-          "word": "hierarchy",
-          "ipa": "/ˈhaɪərɑːrki/",
-          "meaning": "等级制度；阶层",
-          "examples": [
-            {
-              "en": "There is a clear hierarchy within the corporate structure.",
-              "zh": "公司结构内有明确的等级制度。"
-            },
-            {
-              "en": "She quickly rose through the hierarchy of the civil service.",
-              "zh": "她很快就在公务员阶层中获得了晋升。"
-            }
-          ]
-        },
-        {
-          "word": "incentive",
-          "ipa": "/ɪnˈsentɪv/",
-          "meaning": "激励；动机",
-          "examples": [
-            {
-              "en": "The government offers tax incentives to encourage new businesses.",
-              "zh": "政府提供税收激励以鼓励新企业。"
-            },
-            {
-              "en": "Bonus payments provide a strong incentive for staff to work harder.",
-              "zh": "奖金发放为员工更努力工作提供了强有力的激励。"
-            }
-          ]
-        },
-        {
-          "word": "juncture",
-          "ipa": "/ˈdʒʌŋktʃər/",
-          "meaning": "关头；接合点",
-          "examples": [
-            {
-              "en": "At this critical juncture, we need to make a firm decision.",
-              "zh": "在这个关键时刻，我们需要做出坚定的决定。"
-            },
-            {
-              "en": "The project is at a very delicate juncture right now.",
-              "zh": "该项目目前正处于一个非常微妙的关头。"
-            }
-          ]
-        },
-        {
-          "word": "liability",
-          "ipa": "/ˌlaɪəˈbɪləti/",
-          "meaning": "债务；责任",
-          "examples": [
-            {
-              "en": "The company has over one million dollars in total liabilities.",
-              "zh": "该公司的负债总额超过一百万美元。"
-            },
-            {
-              "en": "His lack of experience proved to be a liability for the team.",
-              "zh": "事实证明，他缺乏经验成了团队的累赘。"
-            }
-          ]
-        },
-        {
-          "word": "merger",
-          "ipa": "/ˈmɜːrdʒər/",
-          "meaning": "合并；兼并",
-          "examples": [
-            {
-              "en": "The merger between the two banks was approved by regulators.",
-              "zh": "两家银行的合并已获得监管机构的批准。"
-            },
-            {
-              "en": "The staff are worried about job security following the merger.",
-              "zh": "合并后，员工们担心工作的稳定性。"
-            }
-          ]
-        },
-        {
-          "word": "negotiation",
-          "ipa": "/nɪˌɡəʊʃiˈeɪʃn/",
-          "meaning": "谈判；协商",
-          "examples": [
-            {
-              "en": "The terms of the contract are still under negotiation.",
-              "zh": "合同条款仍在谈判中。"
-            },
-            {
-              "en": "Negotiation is an essential skill for any successful business leader.",
-              "zh": "对于任何成功的商界领袖来说，谈判都是一项必不可少的技能。"
-            }
-          ]
-        },
-        {
-          "word": "outsource",
-          "ipa": "/ˈaʊtsɔːrs/",
-          "meaning": "外包",
-          "examples": [
-            {
-              "en": "Many companies outsource their customer support to specialized firms.",
-              "zh": "许多公司将客户支持外包给专业公司。"
-            },
-            {
-              "en": "We decided to outsource the web development project to save costs.",
-              "zh": "我们决定将网络开发项目外包以节省成本。"
-            }
-          ]
-        },
-        {
-          "word": "portfolio",
-          "ipa": "/pɔːrtˈfəʊliəʊ/",
-          "meaning": "投资组合；作品集",
-          "examples": [
-            {
-              "en": "He manages a diverse portfolio of international stocks.",
-              "zh": "他管理着一个多元化的国际股票投资组合。"
-            },
-            {
-              "en": "The designer presented her portfolio during the interview.",
-              "zh": "设计师在面试中展示了她的作品集。"
-            }
-          ]
-        },
-        {
-          "word": "quota",
-          "ipa": "/ˈkwəʊtə/",
-          "meaning": "配额；定额",
-          "examples": [
-            {
-              "en": "The sales team exceeded their annual quota by ten percent.",
-              "zh": "销售团队超过了年度定额的10%。"
-            },
-            {
-              "en": "Import quotas were imposed to protect the local industry.",
-              "zh": "为了保护当地产业，实行了进口配额。"
-            }
-          ]
-        },
-        {
-          "word": "revenue",
-          "ipa": "/ˈrevənjuː/",
-          "meaning": "收入；税收",
-          "examples": [
-            {
-              "en": "The company reported a record increase in quarterly revenue.",
-              "zh": "该公司报告季度收入创纪录增长。"
-            },
-            {
-              "en": "Ad revenue is the primary source of income for many websites.",
-              "zh": "广告收入是许多网站的主要收入来源。"
-            }
-          ]
-        },
-        {
-          "word": "subsidiary",
-          "ipa": "/səbˈsɪdiəri/",
-          "meaning": "子公司；附属的",
-          "examples": [
-            {
-              "en": "The multinational corporation has subsidiaries in over fifty countries.",
-              "zh": "这家跨国公司在五十多个国家设有子公司。"
-            },
-            {
-              "en": "All other issues are subsidiary to the main goal of survival.",
-              "zh": "所有其他问题与生存这一主要目标相比都是次要的。"
-            }
-          ]
-        },
-        {
-          "word": "turnover",
-          "ipa": "/ˈtɜːrnəʊvər/",
-          "meaning": "营业额；人员更替率",
-          "examples": [
-            {
-              "en": "The restaurant has a high turnover, serving hundreds of customers daily.",
-              "zh": "这家餐厅的营业额很高，每天接待数百名客户。"
-            },
-            {
-              "en": "Low employee turnover is a sign of a healthy corporate culture.",
-              "zh": "低员工流动率是健康企业文化的标志。"
-            }
-          ]
-        },
-        {
-          "word": "uniform",
-          "ipa": "/ˈjuːnɪfɔːrm/",
-          "meaning": "制服；统一的",
-          "examples": [
-            {
-              "en": "All staff members are required to wear a uniform at work.",
-              "zh": "所有员工在工作中都必须穿制服。"
-            },
-            {
-              "en": "The buildings are of a uniform height and design.",
-              "zh": "这些建筑的高度和设计都是统一的。"
-            }
-          ]
-        }
+        { "word": "acquisition", "ipa": "/ˌækwɪˈzɪʃn/", "meaning": "收购；获得", "category": "Business", "examples": [{ "en": "The company announced the acquisition of its main competitor today.", "zh": "该公司今天宣布收购其主要竞争对手。" }, { "en": "Language acquisition is a natural process for young children.", "zh": "语言习得对幼儿来说是一个自然的过程。" }] },
+        { "word": "benchmark", "ipa": "/ˈbentʃmɑːrk/", "meaning": "基准；参照点", "category": "Business", "examples": [{ "en": "The current profit levels will serve as a benchmark for future performance.", "zh": "目前的利润水平将作为未来业绩的基准。" }, { "en": "Our customer service is seen as the benchmark for the entire industry.", "zh": "我们的客户服务被视为整个行业的基准。" }] },
+        { "word": "contingency", "ipa": "/kənˈtɪndʒənsi/", "meaning": "权变措施；偶发事件", "category": "CET-6", "examples": [{ "en": "We must have a contingency plan in case the negotiations fail.", "zh": "我们必须有一个应对谈判失败的应急计划。" }, { "en": "The budget includes a small fund for any unforeseen contingency.", "zh": "预算中包括一小笔用于任何不可预见偶发事件的资金。" }] },
+        { "word": "dividend", "ipa": "/ˈdɪvɪdend/", "meaning": "股息；红利", "category": "Business", "examples": [{ "en": "The company decided to increase its annual dividend to shareholders.", "zh": "公司决定增加向股东发放的年度股息。" }, { "en": "Investing in education will pay a huge dividend in the long run.", "zh": "从长远来看，投资教育将带来巨大的红利。" }] },
+        { "word": "equity", "ipa": "/ˈekwəti/", "meaning": "股本；公平", "category": "Business", "examples": [{ "en": "She has built up a significant amount of equity in her home.", "zh": "她已经在她的房子里积累了大量的资产净值。" }, { "en": "The firm specializes in private equity investments.", "zh": "该事务所专门从事私募股权投资。" }] },
+        { "word": "fluctuation", "ipa": "/ˌflʌktʃuˈeɪʃn/", "meaning": "波动；起伏", "category": "CET-4", "examples": [{ "en": "Market fluctuations can affect the price of gold significantly.", "zh": "市场波动会显著影响黄金价格。" }, { "en": "The constant fluctuation in temperature made everyone uncomfortable.", "zh": "温度的不断波动让每个人都不舒服。" }] },
+        { "word": "grievance", "ipa": "/ˈɡriːvəns/", "meaning": "不满；抱怨", "category": "Business", "examples": [{ "en": "Employees can file a formal grievance if they feel mistreated.", "zh": "如果员工觉得受了委屈，可以提出正式申诉。" }, { "en": "The committee was set up to investigate staff grievances.", "zh": "委员会的成立是为了调查员工的不满。" }] },
+        { "word": "hierarchy", "ipa": "/ˈhaɪərɑːrki/", "meaning": "等级制度；阶层", "category": "CET-6", "examples": [{ "en": "There is a clear hierarchy within the corporate structure.", "zh": "公司结构内有明确的等级制度。" }, { "en": "She quickly rose through the hierarchy of the civil service.", "zh": "她很快就在公务员阶层中获得了晋升。" }] },
+        { "word": "incentive", "ipa": "/ɪnˈsentɪv/", "meaning": "激励；动机", "category": "CET-4", "examples": [{ "en": "The government offers tax incentives to encourage new businesses.", "zh": "政府提供税收激励以鼓励新企业。" }, { "en": "Bonus payments provide a strong incentive for staff to work harder.", "zh": "奖金发放为员工更努力工作提供了强有力的激励。" }] },
+        { "word": "juncture", "ipa": "/ˈdʒʌŋktʃər/", "meaning": "关头；接合点", "category": "TEM-8", "examples": [{ "en": "At this critical juncture, we need to make a firm decision.", "zh": "在这个关键时刻，我们需要做出坚定的决定。" }, { "en": "The project is at a very delicate juncture right now.", "zh": "该项目目前正处于一个非常微妙的关头。" }] },
+        { "word": "liability", "ipa": "/ˌlaɪəˈbɪləti/", "meaning": "债务；责任", "category": "Business", "examples": [{ "en": "The company has over one million dollars in total liabilities.", "zh": "该公司的负债总额超过一百万美元。" }, { "en": "His lack of experience proved to be a liability for the team.", "zh": "事实证明，他缺乏经验成了团队的累赘。" }] },
+        { "word": "merger", "ipa": "/ˈmɜːrdʒər/", "meaning": "合并；兼并", "category": "Business", "examples": [{ "en": "The merger between the two banks was approved by regulators.", "zh": "两家银行的合并已获得监管机构的批准。" }, { "en": "The staff are worried about job security following the merger.", "zh": "合并后，员工们担心工作的稳定性。" }] },
+        { "word": "negotiation", "ipa": "/nɪˌɡəʊʃiˈeɪʃn/", "meaning": "谈判；协商", "category": "Daily", "examples": [{ "en": "The terms of the contract are still under negotiation.", "zh": "合同条款仍在谈判中。" }, { "en": "Negotiation is an essential skill for any successful business leader.", "zh": "对于任何成功的商界领袖来说，谈判都是一项必不可少的技能。" }] },
+        { "word": "outsource", "ipa": "/ˈaʊtsɔːrs/", "meaning": "外包", "category": "Business", "examples": [{ "en": "Many companies outsource their customer support to specialized firms.", "zh": "许多公司将客户支持外包给专业公司。" }, { "en": "We decided to outsource the web development project to save costs.", "zh": "我们决定将网络开发项目外包以节省成本。" }] },
+        { "word": "portfolio", "ipa": "/pɔːrtˈfəʊliəʊ/", "meaning": "投资组合；作品集", "category": "Daily", "examples": [{ "en": "He manages a diverse portfolio of international stocks.", "zh": "他管理着一个多元化的国际股票投资组合。" }, { "en": "The designer presented her portfolio during the interview.", "zh": "设计师在面试中展示了她的作品集。" }] },
+        { "word": "quota", "ipa": "/ˈkwəʊtə/", "meaning": "配额；定额", "category": "Business", "examples": [{ "en": "The sales team exceeded their annual quota by ten percent.", "zh": "销售团队超过了年度定额的10%。" }, { "en": "Import quotas were imposed to protect the local industry.", "zh": "为了保护当地产业，实行了进口配额。" }] },
+        { "word": "revenue", "ipa": "/ˈrevənjuː/", "meaning": "收入；税收", "category": "CET-4", "examples": [{ "en": "The company reported a record increase in quarterly revenue.", "zh": "该公司报告季度收入创纪录增长。" }, { "en": "Ad revenue is the primary source of income for many websites.", "zh": "广告收入是许多网站的主要收入来源。" }] },
+        { "word": "subsidiary", "ipa": "/səbˈsɪdiəri/", "meaning": "子公司；附属的", "category": "Business", "examples": [{ "en": "The multinational corporation has subsidiaries in over fifty countries.", "zh": "这家跨国公司在五十多个国家设有子公司。" }, { "en": "All other issues are subsidiary to the main goal of survival.", "zh": "所有其他问题与生存这一主要目标相比都是次要的。" }] },
+        { "word": "turnover", "ipa": "/ˈtɜːrnəʊvər/", "meaning": "营业额；人员更替率", "category": "Business", "examples": [{ "en": "The restaurant has a high turnover, serving hundreds of customers daily.", "zh": "这家餐厅的营业额很高，每天接待数百名客户。" }, { "en": "Low employee turnover is a sign of a healthy corporate culture.", "zh": "低员工流动率是健康企业文化的标志。" }] },
+        { "word": "uniform", "ipa": "/ˈjuːnɪfɔːrm/", "meaning": "制服；统一的", "category": "Daily", "examples": [{ "en": "All staff members are required to wear a uniform at work.", "zh": "所有员工在工作中都必须穿制服。" }, { "en": "The buildings are of a uniform height and design.", "zh": "这些建筑的高度和设计都是统一的。" }] }
       ]
     },
     {
       "id": 2,
       "name": "GROUP 2",
       "words": [
-        {
-          "word": "affiliate",
-          "ipa": "/əˈfɪlieɪt/",
-          "meaning": "子公司；附属机构",
-          "examples": [
-            {
-              "en": "The university has several research affiliates across Europe.",
-              "zh": "这所大学在欧洲各地有几个研究附属机构。"
-            },
-            {
-              "en": "He decided to affiliate his local club with the national organization.",
-              "zh": "他决定将他的地方俱乐部并入国家组织。"
-            }
-          ]
-        },
-        {
-          "word": "breach",
-          "ipa": "/briːtʃ/",
-          "meaning": "违约；裂缝",
-          "examples": [
-            {
-              "en": "The company was sued for a breach of contract.",
-              "zh": "该公司因违约被起诉。"
-            },
-            {
-              "en": "There was a security breach at the main server room.",
-              "zh": "主服务器机房发生了安全违规事件。"
-            }
-          ]
-        },
-        {
-          "word": "commission",
-          "ipa": "/kəˈmɪʃn/",
-          "meaning": "委员会；佣金",
-          "examples": [
-            {
-              "en": "The salesperson earns a ten percent commission on every deal.",
-              "zh": "销售员在每笔交易中赚取10%的佣金。"
-            },
-            {
-              "en": "A special commission was formed to investigate the incident.",
-              "zh": "成立了一个特别委员会来调查这一事件。"
-            }
-          ]
-        },
-        {
-          "word": "deficit",
-          "ipa": "/ˈdefɪsɪt/",
-          "meaning": "赤字；亏损",
-          "examples": [
-            {
-              "en": "The government is struggling to reduce the national budget deficit.",
-              "zh": "政府正努力减少国家预算赤字。"
-            },
-            {
-              "en": "There is a significant deficit of skilled workers in the tech sector.",
-              "zh": "科技行业熟练工人的缺口很大。"
-            }
-          ]
-        },
-        {
-          "word": "endorsement",
-          "ipa": "/ɪnˈdɔːrsmənt/",
-          "meaning": "背书；赞同",
-          "examples": [
-            {
-              "en": "The celebrity's endorsement helped boost the brand's sales.",
-              "zh": "这位名人的代言帮助提升了品牌的销售额。"
-            },
-            {
-              "en": "The policy received a strong endorsement from the board of directors.",
-              "zh": "该政策得到了董事会的强烈赞同。"
-            }
-          ]
-        },
-        {
-          "word": "forecast",
-          "ipa": "/ˈfɔːrkæst/",
-          "meaning": "预测；预报",
-          "examples": [
-            {
-              "en": "The economic forecast suggests a slow recovery for next year.",
-              "zh": "经济预测表明明年将缓慢复苏。"
-            },
-            {
-              "en": "Meteorologists forecast heavy rain for the weekend.",
-              "zh": "气象学家预报周末有大雨。"
-            }
-          ]
-        },
-        {
-          "word": "guarantor",
-          "ipa": "/ˌɡærənˈtɔːr/",
-          "meaning": "担保人",
-          "examples": [
-            {
-              "en": "His father acted as a guarantor for his student loan.",
-              "zh": "他的父亲担任了他的学生贷款担保人。"
-            },
-            {
-              "en": "A guarantor is legally responsible for the debt if the borrower fails to pay.",
-              "zh": "如果借款人未支付，担保人将在法律上对债务负责。"
-            }
-          ]
-        },
-        {
-          "word": "infrastructure",
-          "ipa": "/ˈɪnfrəstrʌktʃər/",
-          "meaning": "基础设施",
-          "examples": [
-            {
-              "en": "Investment in transport infrastructure is essential for economic growth.",
-              "zh": "交通基础设施投资对经济增长至关重要。"
-            },
-            {
-              "en": "The city needs to upgrade its aging water infrastructure.",
-              "zh": "这座城市需要升级其老化的供水基础设施。"
-            }
-          ]
-        },
-        {
-          "word": "jeopardize",
-          "ipa": "/ˈdʒepərdaɪz/",
-          "meaning": "危害；使受险",
-          "examples": [
-            {
-              "en": "The scandal could jeopardize the politician's career.",
-              "zh": "这桩丑闻可能会危及这位政治家的职业生涯。"
-            },
-            {
-              "en": "Bad weather might jeopardize our plans for the outdoor event.",
-              "zh": "恶劣的天气可能会危及我们户外活动的计划。"
-            }
-          ]
-        },
-        {
-          "word": "liquidate",
-          "ipa": "/ˈlɪkwɪdeɪt/",
-          "meaning": "清算；变现",
-          "examples": [
-            {
-              "en": "The company was forced to liquidate its assets to pay creditors.",
-              "zh": "该公司被迫变现资产以支付债权人。"
-            },
-            {
-              "en": "Investors may choose to liquidate their positions during a market crash.",
-              "zh": "投资者可能会在市场崩盘期间选择清仓。"
-            }
-          ]
-        },
-        {
-          "word": "monopoly",
-          "ipa": "/məˈnɒpəli/",
-          "meaning": "垄断",
-          "examples": [
-            {
-              "en": "The government is trying to break up the telecommunications monopoly.",
-              "zh": "政府正试图打破电信垄断。"
-            },
-            {
-              "en": "Having a monopoly allows a company to set higher prices.",
-              "zh": "拥有垄断地位使公司能够设定更高的价格。"
-            }
-          ]
-        },
-        {
-          "word": "nominee",
-          "ipa": "/ˌnɒmɪˈniː/",
-          "meaning": "被提名者",
-          "examples": [
-            {
-              "en": "The board has announced its official nominee for the CEO position.",
-              "zh": "董事会已经宣布了首席执行官职位的正式提名人。"
-            },
-            {
-              "en": "Award nominees will be revealed during the ceremony.",
-              "zh": "奖项提名人将在仪式期间揭晓。"
-            }
-          ]
-        },
-        {
-          "word": "overhaul",
-          "ipa": "/ˌəʊvəˈhɔːl/",
-          "meaning": "彻底检修；改革",
-          "examples": [
-            {
-              "en": "The education system needs a complete overhaul to meet modern needs.",
-              "zh": "教育系统需要彻底改革以满足现代需求。"
-            },
-            {
-              "en": "They decided to overhaul the machinery during the holiday break.",
-              "zh": "他们决定在假期休整期间对机器进行全面检修。"
-            }
-          ]
-        },
-        {
-          "word": "redundancy",
-          "ipa": "/rɪˈdʌndənsi/",
-          "meaning": "裁员；多余",
-          "examples": [
-            {
-              "en": "The factory closure resulted in several hundred redundancies.",
-              "zh": "工厂关闭导致数百人被裁员。"
-            },
-            {
-              "en": "The system has built-in redundancy to prevent total failure.",
-              "zh": "该系统具有内置冗余以防止全面故障。"
-            }
-          ]
-        },
-        {
-          "word": "solvency",
-          "ipa": "/ˈsɒlvənsi/",
-          "meaning": "偿付能力",
-          "examples": [
-            {
-              "en": "The audit confirmed the company's long-term solvency.",
-              "zh": "审计确认了公司的长期偿付能力。"
-            },
-            {
-              "en": "Bank regulators monitor the solvency of financial institutions.",
-              "zh": "银行监管机构监控金融机构的偿付能力。"
-            }
-          ]
-        },
-        {
-          "word": "underwrite",
-          "ipa": "/ˈʌndərraɪt/",
-          "meaning": "承销；保险",
-          "examples": [
-            {
-              "en": "The bank agreed to underwrite the new stock offering.",
-              "zh": "银行同意承销新发行的股票。"
-            },
-            {
-              "en": "Insurance companies underwrite risks associated with natural disasters.",
-              "zh": "保险公司承保与自然灾害相关的风险。"
-            }
-          ]
-        },
-        {
-          "word": "variance",
-          "ipa": "/ˈveəriəns/",
-          "meaning": "差异；方差",
-          "examples": [
-            {
-              "en": "There is a significant variance in the test results across different groups.",
-              "zh": "不同组之间的测试结果存在显著差异。"
-            },
-            {
-              "en": "He requested a variance from the local zoning laws.",
-              "zh": "他申请了当地分区法的变更许可。"
-            }
-          ]
-        },
-        {
-          "word": "wholesale",
-          "ipa": "/ˈhəʊlseɪl/",
-          "meaning": "批发；大规模的",
-          "examples": [
-            {
-              "en": "We buy our supplies at wholesale prices to save money.",
-              "zh": "我们以批发价购买供应品以省钱。"
-            },
-            {
-              "en": "The company underwent wholesale changes in its management team.",
-              "zh": "公司管理团队经历了大规模的人事变动。"
-            }
-          ]
-        },
-        {
-          "word": "yield",
-          "ipa": "/jiːld/",
-          "meaning": "产量；收益率",
-          "examples": [
-            {
-              "en": "The new farming techniques have significantly increased the crop yield.",
-              "zh": "新的耕作技术显著提高了农作物产量。"
-            },
-            {
-              "en": "The bond offers a high annual yield to investors.",
-              "zh": "该债券向投资者提供高额的年度收益率。"
-            }
-          ]
-        },
-        {
-          "word": "stagnation",
-          "ipa": "/stæɡˈneɪʃn/",
-          "meaning": "停滞；不景气",
-          "examples": [
-            {
-              "en": "The economy has suffered from a long period of stagnation.",
-              "zh": "经济遭受了长期的停滞。"
-            },
-            {
-              "en": "Lack of innovation can lead to career stagnation for engineers.",
-              "zh": "缺乏创新会导致工程师的职业生涯停滞。"
-            }
-          ]
-        }
+        { "word": "affiliate", "ipa": "/əˈfɪlieɪt/", "meaning": "子公司；附属机构", "category": "Business", "examples": [{ "en": "The university has several research affiliates across Europe.", "zh": "这所大学在欧洲各地有几个研究附属机构。" }, { "en": "He decided to affiliate his local club with the national organization.", "zh": "他决定将他的地方俱乐部并入国家组织。" }] },
+        { "word": "breach", "ipa": "/briːtʃ/", "meaning": "违约；裂缝", "category": "CET-6", "examples": [{ "en": "The company was sued for a breach of contract.", "zh": "该公司因违约被起诉。" }, { "en": "There was a security breach at the main server room.", "zh": "主服务器机房发生了安全违规事件。" }] },
+        { "word": "commission", "ipa": "/kəˈmɪʃn/", "meaning": "委员会；佣金", "category": "Business", "examples": [{ "en": "The salesperson earns a ten percent commission on every deal.", "zh": "销售员在每笔交易中赚取10%的佣金。" }, { "en": "A special commission was formed to investigate the incident.", "zh": "成立了一个特别委员会来调查这一事件。" }] },
+        { "word": "deficit", "ipa": "/ˈdefɪsɪt/", "meaning": "赤字；亏损", "category": "CET-6", "examples": [{ "en": "The government is struggling to reduce the national budget deficit.", "zh": "政府正努力减少国家预算赤字。" }, { "en": "There is a significant deficit of skilled workers in the tech sector.", "zh": "科技行业熟练工人的缺口很大。" }] },
+        { "word": "endorsement", "ipa": "/ɪnˈdɔːrsmənt/", "meaning": "背书；赞同", "category": "Daily", "examples": [{ "en": "The celebrity's endorsement helped boost the brand's sales.", "zh": "这位名人的代言帮助提升了品牌的销售额。" }, { "en": "The policy received a strong endorsement from the board of directors.", "zh": "该政策得到了董事会的强烈赞同。" }] },
+        { "word": "forecast", "ipa": "/ˈfɔːrkæst/", "meaning": "预测；预报", "category": "CET-4", "examples": [{ "en": "The economic forecast suggests a slow recovery for next year.", "zh": "经济预测表明明年将缓慢复苏。" }, { "en": "Meteorologists forecast heavy rain for the weekend.", "zh": "气象学家预报周末有大雨。" }] },
+        { "word": "guarantor", "ipa": "/ˌɡærənˈtɔːr/", "meaning": "担保人", "category": "Business", "examples": [{ "en": "His father acted as a guarantor for his student loan.", "zh": "他的父亲担任了他的学生贷款担保人。" }, { "en": "A guarantor is legally responsible for the debt if the borrower fails to pay.", "zh": "如果借款人未支付，担保人将在法律上对债务负责。" }] },
+        { "word": "infrastructure", "ipa": "/ˈɪnfrəstrʌktʃər/", "meaning": "基础设施", "category": "CET-4", "examples": [{ "en": "Investment in transport infrastructure is essential for economic growth.", "zh": "交通基础设施投资对经济增长至关重要。" }, { "en": "The city needs to upgrade its aging water infrastructure.", "zh": "这座城市需要升级其老化的供水基础设施。" }] },
+        { "word": "jeopardize", "ipa": "/ˈdʒepərdaɪz/", "meaning": "危害；使受险", "category": "TEM-8", "examples": [{ "en": "The scandal could jeopardize the politician's career.", "zh": "这桩丑闻可能会危及这位政治家的职业生涯。" }, { "en": "Bad weather might jeopardize our plans for the outdoor event.", "zh": "恶劣的天气可能会危及我们户外活动的计划。" }] },
+        { "word": "liquidate", "ipa": "/ˈlɪkwɪdeɪt/", "meaning": "清算；变现", "category": "Business", "examples": [{ "en": "The company was forced to liquidate its assets to pay creditors.", "zh": "该公司被迫变现资产以支付债权人。" }, { "en": "Investors may choose to liquidate their positions during a market crash.", "zh": "投资者可能会在市场崩盘期间选择清仓。" }] },
+        { "word": "monopoly", "ipa": "/məˈnɒpəli/", "meaning": "垄断", "category": "CET-6", "examples": [{ "en": "The government is trying to break up the telecommunications monopoly.", "zh": "政府正试图打破电信垄断。" }, { "en": "Having a monopoly allows a company to set higher prices.", "zh": "拥有垄断地位使公司能够设定更高的价格。" }] },
+        { "word": "nominee", "ipa": "/ˌnɒmɪˈniː/", "meaning": "被提名者", "category": "Business", "examples": [{ "en": "The board has announced its official nominee for the CEO position.", "zh": "董事会已经宣布了首席执行官职位的正式提名人。" }, { "en": "Award nominees will be revealed during the ceremony.", "zh": "奖项提名人将在仪式期间揭晓。" }] },
+        { "word": "overhaul", "ipa": "/ˌəʊvəˈhɔːl/", "meaning": "彻底检修；改革", "category": "CET-6", "examples": [{ "en": "The education system needs a complete overhaul to meet modern needs.", "zh": "教育系统需要彻底改革以满足现代需求。" }, { "en": "They decided to overhaul the machinery during the holiday break.", "zh": "他们决定在假期休整期间对机器进行全面检修。" }] },
+        { "word": "redundancy", "ipa": "/rɪˈdʌndənsi/", "meaning": "裁员；多余", "category": "Business", "examples": [{ "en": "The factory closure resulted in several hundred redundancies.", "zh": "工厂关闭导致数百人被裁员。" }, { "en": "The system has built-in redundancy to prevent total failure.", "zh": "该系统具有内置冗余以防止全面故障。" }] },
+        { "word": "solvency", "ipa": "/ˈsɒlvənsi/", "meaning": "偿付能力", "category": "Business", "examples": [{ "en": "The audit confirmed the company's long-term solvency.", "zh": "审计确认了公司的长期偿付能力。" }, { "en": "Bank regulators monitor the solvency of financial institutions.", "zh": "银行监管机构监控金融机构的偿付能力。" }] },
+        { "word": "underwrite", "ipa": "/ˈʌndərraɪt/", "meaning": "承销；保险", "category": "Business", "examples": [{ "en": "The bank agreed to underwrite the new stock offering.", "zh": "银行同意承销新发行的股票。" }, { "en": "Insurance companies underwrite risks associated with natural disasters.", "zh": "保险公司承保与自然灾害相关的风险。" }] },
+        { "word": "variance", "ipa": "/ˈveəriəns/", "meaning": "差异；方差", "category": "CET-4", "examples": [{ "en": "There is a significant variance in the test results across different groups.", "zh": "不同组之间的测试结果存在显著差异。" }, { "en": "He requested a variance from the local zoning laws.", "zh": "他申请了当地分区法的变更许可。" }] },
+        { "word": "wholesale", "ipa": "/ˈhəʊlseɪl/", "meaning": "批发；大规模的", "category": "Business", "examples": [{ "en": "We buy our supplies at wholesale prices to save money.", "zh": "我们以批发价购买供应品以省钱。" }, { "en": "The company underwent wholesale changes in its management team.", "zh": "公司管理团队经历了大规模的人事变动。" }] },
+        { "word": "yield", "ipa": "/jiːld/", "meaning": "产量；收益率", "category": "CET-4", "examples": [{ "en": "The new farming techniques have significantly increased the crop yield.", "zh": "新的耕作技术显著提高了农作物产量。" }, { "en": "The bond offers a high annual yield to investors.", "zh": "该债券向投资者提供高额的年度收益率。" }] },
+        { "word": "stagnation", "ipa": "/stæɡˈneɪʃn/", "meaning": "停滞；不景气", "category": "CET-6", "examples": [{ "en": "The economy has suffered from a long period of stagnation.", "zh": "经济遭受了长期的停滞。" }, { "en": "Lack of innovation can lead to career stagnation for engineers.", "zh": "缺乏创新会导致工程师的职业生涯停滞。" }] }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "GROUP 3",
+      "words": [
+        { "word": "elated", "ipa": "/iˈleɪtɪd/", "meaning": "兴高采烈的", "category": "Emotions", "examples": [{ "en": "The team was elated after winning the championship.", "zh": "夺冠后，全队都兴高采烈。" }, { "en": "She felt elated at the news of her promotion.", "zh": "听到晋升的消息，她感到欣喜若狂。" }] },
+        { "word": "apprehensive", "ipa": "/ˌæprɪˈhensɪv/", "meaning": "忧虑的；担心的", "category": "Emotions", "examples": [{ "en": "I'm a bit apprehensive about the outcome of the surgery.", "zh": "我对手术的结果有点担心。" }, { "en": "Students are often apprehensive before a major exam.", "zh": "学生在大考前往往会感到忧虑。" }] },
+        { "word": "redundant", "ipa": "/rɪˈdʌndənt/", "meaning": "多余的；被裁减的", "category": "CET-4", "examples": [{ "en": "The office has become redundant since the digitalization.", "zh": "自从数字化以来，这个办公室就变得多余了。" }, { "en": "He was made redundant after the company closed its branch.", "zh": "公司关闭分部后，他被裁员了。" }] },
+        { "word": "vigilant", "ipa": "/ˈvɪdʒɪlənt/", "meaning": "警觉的；警惕的", "category": "TEM-8", "examples": [{ "en": "We must remain vigilant against any potential security threats.", "zh": "我们必须对任何潜在的安全威胁保持警惕。" }, { "en": "The security guards were instructed to be extremely vigilant.", "zh": "保安人员被指示要极其警觉。" }] },
+        { "word": "volatile", "ipa": "/ˈvɒlətaɪl/", "meaning": "不稳定的；易挥发的", "category": "CET-6", "examples": [{ "en": "The stock market has been highly volatile this month.", "zh": "这个月的股市一直非常不稳定。" }, { "en": "He has a volatile temper and can get angry very quickly.", "zh": "他的脾气反复无常，很快就会生气。" }] },
+        { "word": "scrutinize", "ipa": "/ˈskruːtənaɪz/", "meaning": "详细检查；细看", "category": "TEM-8", "examples": [{ "en": "The detectives began to scrutinize the crime scene for clues.", "zh": "侦探们开始仔细检查犯罪现场寻找线索。" }, { "en": "The board will scrutinize every detail of the merger proposal.", "zh": "董事会将详细审查合并提案的每一个细节。" }] },
+        { "word": "reconcile", "ipa": "/ˈrekənsaɪl/", "meaning": "调解；和解", "category": "CET-6", "examples": [{ "en": "It's difficult to reconcile his words with his actions.", "zh": "很难将他的言行统一起来。" }, { "en": "The couple managed to reconcile after their long separation.", "zh": "这对夫妇在长期分居后终于和解了。" }] },
+        { "word": "prevalent", "ipa": "/ˈprevələnt/", "meaning": "流行的；普遍的", "category": "CET-4", "examples": [{ "en": "The use of smartphones is prevalent among all age groups.", "zh": "智能手机的使用在所有年龄段中都很普遍。" }, { "en": "Low-carb diets have become very prevalent in recent years.", "zh": "近年来，低碳饮食变得非常流行。" }] },
+        { "word": "optimize", "ipa": "/ˈɒptɪmaɪz/", "meaning": "优化；完善", "category": "CET-4", "examples": [{ "en": "We need to optimize our website for better search rankings.", "zh": "我们需要优化我们的网站以获得更好的搜索排名。" }, { "en": "The new software is designed to optimize production efficiency.", "zh": "新软件旨在优化生产效率。" }] },
+        { "word": "mitigate", "ipa": "/ˈmɪtɪɡeɪt/", "meaning": "缓解；减轻", "category": "CET-6", "examples": [{ "en": "The government took steps to mitigate the effects of the drought.", "zh": "政府采取措施以减轻干旱的影响。" }, { "en": "Planting trees can help mitigate the impact of climate change.", "zh": "种树有助于缓解气候变化的影响。" }] },
+        { "word": "leverage", "ipa": "/ˈliːvərɪdʒ/", "meaning": "利用；杠杆作用", "category": "Business", "examples": [{ "en": "The company aims to leverage its brand to enter new markets.", "zh": "该公司旨在利用其品牌进入新市场。" }, { "en": "Using high leverage can increase both risks and rewards.", "zh": "使用高杠杆既会增加风险，也会增加回报。" }] },
+        { "word": "integrated", "ipa": "/ˈɪntɪɡreɪtɪd/", "meaning": "整合的；集成的", "category": "CET-4", "examples": [{ "en": "The system features an integrated payment processing module.", "zh": "该系统具有集成的支付处理模块。" }, { "en": "We offer an integrated solution for all your marketing needs.", "zh": "我们为您的所有营销需求提供整合的解决方案。" }] },
+        { "word": "innovation", "ipa": "/ˌɪnəˈveɪʃn/", "meaning": "创新；革新", "category": "Daily", "examples": [{ "en": "Constant innovation is the key to staying competitive.", "zh": "不断的创新是保持竞争力的关键。" }, { "en": "The award recognizes outstanding innovation in technology.", "zh": "该奖项表彰在技术方面的杰出创新。" }] },
+        { "word": "implement", "ipa": "/ˈɪmplɪment/", "meaning": "实施；工具", "category": "CET-4", "examples": [{ "en": "The committee is ready to implement the new policy.", "zh": "委员会准备实施新政策。" }, { "en": "Farmers use various implements to cultivate the land.", "zh": "农民使用各种工具来耕种土地。" }] },
+        { "word": "formulate", "ipa": "/ˈfɔːrmjuleɪt/", "meaning": "制定；规划", "category": "CET-6", "examples": [{ "en": "We need to formulate a clear strategy for the next five years.", "zh": "我们需要为接下来的五年制定一个明确的战略。" }, { "en": "Scientists are trying to formulate a vaccine against the virus.", "zh": "科学家们正试图研制一种针对该病毒的疫苗。" }] },
+        { "word": "facilitate", "ipa": "/fəˈsɪlɪteɪt/", "meaning": "促进；使便利", "category": "CET-6", "examples": [{ "en": "The new bridge will facilitate travel between the two cities.", "zh": "新桥将便利两座城市之间的往来。" }, { "en": "The structured environment is designed to facilitate learning.", "zh": "结构化的环境旨在促进学习。" }] },
+        { "word": "expedite", "ipa": "/ˈekspədaɪt/", "meaning": "加快；促进", "category": "TEM-8", "examples": [{ "en": "Please take all necessary steps to expedite the delivery.", "zh": "请采取一切必要措施以加快送货速度。" }, { "en": "The new system will expedite the processing of visa applications.", "zh": "新系统将加快签证申请的处理速度。" }] },
+        { "word": "evaluate", "ipa": "/ɪˈvæljueɪt/", "meaning": "评估；评价", "category": "CET-4", "examples": [{ "en": "We need to evaluate the potential risks before investing.", "zh": "投资前我们需要评估潜在的风险。" }, { "en": "Teachers use various methods to evaluate student progress.", "zh": "教师使用各种方法来评估学生的进度。" }] },
+        { "word": "deviate", "ipa": "/ˈdiːvieɪt/", "meaning": "偏离；背离", "category": "CET-6", "examples": [{ "en": "The pilot was forced to deviate from the original flight path.", "zh": "飞行员被迫偏离了原来的飞行路线。" }, { "en": "Do not deviate from the instructions provided in the manual.", "zh": "不要偏离手册中提供的指示。" }] },
+        { "word": "consolidate", "ipa": "/kənˈsɒlɪdeɪt/", "meaning": "巩固；合并", "category": "CET-6", "examples": [{ "en": "The company plans to consolidate its position in the market.", "zh": "公司计划巩固其在市场中的地位。" }, { "en": "We should consolidate all our debts into a single loan.", "zh": "我们应该将所有的债务合并为一笔贷款。" }] }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "GROUP 4",
+      "words": [
+        { "word": "collaborate", "ipa": "/kəˈlæbəreɪt/", "meaning": "合作；协作", "category": "Daily", "examples": [{ "en": "Researchers from both universities will collaborate on the project.", "zh": "来自两所大学的研究人员将在这个项目上进行合作。" }, { "en": "The two companies decided to collaborate to develop a new app.", "zh": "这两家公司决定合作开发一款新应用。" }] },
+        { "word": "clarify", "ipa": "/ˈklærəfaɪ/", "meaning": "澄清；阐明", "category": "CET-4", "examples": [{ "en": "Could you please clarify your last statement?", "zh": "请你澄清一下你刚才说的话好吗？" }, { "en": "The meeting helped clarify the goals of the organization.", "zh": "会议有助于阐明该组织的目标。" }] },
+        { "word": "anticipate", "ipa": "/ænˈtɪsɪpeɪt/", "meaning": "预料；期待", "category": "CET-4", "examples": [{ "en": "We anticipate that the project will be finished by July.", "zh": "我们预料该项目将在七月前完成。" }, { "en": "The organizers did not anticipate such a large crowd.", "zh": "组织者没有预料到会有这么多人。" }] },
+        { "word": "allocate", "ipa": "/ˈæləkeɪt/", "meaning": "分配；划拨", "category": "Business", "examples": [{ "en": "The budget allocates funds for new hospital equipment.", "zh": "预算拨出了购买新医院设备的资金。" }, { "en": "We need to allocate tasks to each member of the team.", "zh": "我们需要给团队的每个成员分配任务。" }] },
+        { "word": "advocate", "ipa": "/ˈædvəkət/", "meaning": "提倡；辩护者", "category": "CET-6", "examples": [{ "en": "He is a strong advocate for environmental protection.", "zh": "他是环境保护的有力倡导者。" }, { "en": "The group advocates for the rights of the disabled.", "zh": "该团体提倡残疾人的权利。" }] },
+        { "word": "vulnerable", "ipa": "/ˈvʌlnərəbl/", "meaning": "易受伤害的；脆弱的", "category": "CET-6", "examples": [{ "en": "Young children are particularly vulnerable to the virus.", "zh": "幼儿特别容易感染这种病毒。" }, { "en": "The old city walls are vulnerable to further damage.", "zh": "旧城墙很容易受到进一步的破坏。" }] },
+        { "word": "utilize", "ipa": "/ˈjuːtəlaɪz/", "meaning": "利用；使用", "category": "CET-4", "examples": [{ "en": "We must utilize all available resources to complete the task.", "zh": "我们必须利用一切可用资源来完成任务。" }, { "en": "The company aims to utilize new technology to save energy.", "zh": "公司旨在利用新技术来节约能源。" }] },
+        { "word": "skeptical", "ipa": "/ˈskeptɪkl/", "meaning": "怀疑的；不相信的", "category": "Emotions", "examples": [{ "en": "Many people are skeptical about the new government policy.", "zh": "许多人对政府的新政策持怀疑态度。" }, { "en": "He was skeptical of her excuses for being late.", "zh": "他不相信她迟到的借口。" }] },
+        { "word": "resilient", "ipa": "/rɪˈzɪliənt/", "meaning": "有弹性的；迅速恢复的", "category": "CET-6", "examples": [{ "en": "Children are remarkably resilient and adapt quickly to change.", "zh": "孩子们的适应能力非常强，能很快适应变化。" }, { "en": "The economy has proven to be resilient despite the crisis.", "zh": "尽管发生了危机，事实证明经济还是很有韧性的。" }] },
+        { "word": "precaution", "ipa": "/prɪˈkɔːʃn/", "meaning": "预防措施", "category": "Daily", "examples": [{ "en": "As a precaution, the building was evacuated immediately.", "zh": "作为预防措施，整栋楼立即被疏散了。" }, { "en": "Always wear a helmet as a basic safety precaution.", "zh": "始终佩戴头盔作为基本的安全预防措施。" }] },
+        { "word": "mandatory", "ipa": "/ˈmændətɔːri/", "meaning": "强制的；法定的", "category": "CET-6", "examples": [{ "en": "It is mandatory for all students to wear a uniform.", "zh": "所有学生必须穿校服。" }, { "en": "Wearing a seatbelt is mandatory in most countries.", "zh": "在大多数国家，系安全带是强制性的。" }] },
+        { "word": "lucrative", "ipa": "/ˈluːkrətɪv/", "meaning": "获利丰厚的", "category": "Business", "examples": [{ "en": "The export business proved to be highly lucrative.", "zh": "事实证明出口业务获利丰厚。" }, { "en": "He left his teaching job for a more lucrative career in law.", "zh": "他辞去了教职，转而从事更有利可图的法律职业。" }] },
+        { "word": "intrinsic", "ipa": "/ɪnˈtrɪnzɪk/", "meaning": "固有的；本质的", "category": "TEM-8", "examples": [{ "en": "Good design is intrinsic to the product's success.", "zh": "好的设计是产品成功的固有要素。" }, { "en": "Curiosity is an intrinsic part of human nature.", "zh": "好奇心是人类天性中固有的一部分。" }] },
+        { "word": "intermittent", "ipa": "/ˌɪntəˈmɪtənt/", "meaning": "断断续续的", "category": "CET-6", "examples": [{ "en": "The region experienced intermittent rain throughout the day.", "zh": "该地区全天断断续续地下着雨。" }, { "en": "The engine was making an intermittent clicking sound.", "zh": "发动机发出断断续续的咔嗒声。" }] },
+        { "word": "integrity", "ipa": "/ɪnˈteɡrəti/", "meaning": "诚实正直；完整", "category": "CET-4", "examples": [{ "en": "He is a man of high personal and professional integrity.", "zh": "他是一个在个人和职业上都高度正直的人。" }, { "en": "Structural integrity is crucial for any large building.", "zh": "结构的完整性对于任何大型建筑都至关重要。" }] },
+        { "word": "initiative", "ipa": "/ɪˈnɪʃətɪv/", "meaning": "主动性；倡议", "category": "CET-4", "examples": [{ "en": "The government has launched a new initiative to help the homeless.", "zh": "政府发起了一项帮助无家可归者的新倡议。" }, { "en": "You need to show more initiative if you want a promotion.", "zh": "如果你想升职，就需要表现出更多的主动性。" }] },
+        { "word": "infrastructure", "ipa": "/ˈɪnfrəstrʌktʃər/", "meaning": "基础设施", "category": "CET-4", "examples": [{ "en": "Improving the aging infrastructure is a top priority.", "zh": "改善老化的基础设施是当务之急。" }, { "en": "The city's transport infrastructure is under immense pressure.", "zh": "这座城市的交通基础设施正承受着巨大的压力。" }] },
+        { "word": "incorporate", "ipa": "/ɪnˈkɔːrpəreɪt/", "meaning": "包含；合并", "category": "CET-6", "examples": [{ "en": "The new design will incorporate several innovative features.", "zh": "新设计将包含几项创新功能。" }, { "en": "We decided to incorporate the subsidiary into the main company.", "zh": "我们决定将子公司并入母公司。" }] },
+        { "word": "imminent", "ipa": "/ˈɪmɪnənt/", "meaning": "即将来临的", "category": "TEM-8", "examples": [{ "en": "The dark clouds suggest that a storm is imminent.", "zh": "乌云预示着风暴即将来临。" }, { "en": "He warned that a financial crisis was imminent.", "zh": "他警告说金融危机迫在眉睫。" }] },
+        { "word": "hypothetical", "ipa": "/ˌhaɪpəˈθetɪkl/", "meaning": "假设的", "category": "TEM-8", "examples": [{ "en": "Let's consider a hypothetical situation where prices double.", "zh": "让我们考虑一种价格翻倍的假设情况。" }, { "en": "The question was purely hypothetical and not based on facts.", "zh": "这个问题纯粹是假设性的，并非基于事实。" }] }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "GROUP 5",
+      "words": [
+        { "word": "gratitude", "ipa": "/ˈɡrætɪtjuːd/", "meaning": "感激；谢意", "category": "Emotions", "examples": [{ "en": "I want to express my deep gratitude for all your help.", "zh": "我想对你所有的帮助表示深深的感激。" }, { "en": "The charity received many letters of gratitude from those it helped.", "zh": "该慈善机构收到了许多被帮助者的感谢信。" }] },
+        { "word": "frustrated", "ipa": "/frʌˈstreɪtɪd/", "meaning": "沮丧的；挫败的", "category": "Emotions", "examples": [{ "en": "He felt frustrated when he couldn't solve the math problem.", "zh": "当他解不出那道数学题时，他感到很沮丧。" }, { "en": "Customers get frustrated when they are kept waiting on the phone.", "zh": "当客户在电话里一直等待时，他们会感到很沮丧。" }] },
+        { "word": "feasibility", "ipa": "/ˌfiːzəˈbɪləti/", "meaning": "可行性", "category": "Business", "examples": [{ "en": "We are conducting a feasibility study on the new project.", "zh": "我们正在对这个新项目进行可行性研究。" }, { "en": "The board questioned the economic feasibility of the plan.", "zh": "董事会质疑该计划在经济上的可行性。" }] },
+        { "word": "exemplify", "ipa": "/ɪɡˈzemplɪfaɪ/", "meaning": "举例说明；是...的典范", "category": "CET-6", "examples": [{ "en": "This building exemplifies the best of modern architecture.", "zh": "这座建筑是现代建筑最佳范例。" }, { "en": "His actions exemplify the values of our company.", "zh": "他的行为体现了我们公司的价值观。" }] },
+        { "word": "exclusive", "ipa": "/ɪkˈskluːsɪv/", "meaning": "独有的；高级的", "category": "Daily", "examples": [{ "en": "The magazine published an exclusive interview with the star.", "zh": "杂志发表了对这位明星的独家采访。" }, { "en": "This is an exclusive club for members only.", "zh": "这是一家仅限会员的进阶俱乐部。" }] },
+        { "word": "distort", "ipa": "/dɪˈstɔːrt/", "meaning": "扭曲；歪曲", "category": "CET-6", "examples": [{ "en": "The media was accused of trying to distort the facts.", "zh": "媒体被指责试图歪曲事实。" }, { "en": "The cheap mirror began to distort my reflection.", "zh": "那个廉价的镜子开始扭曲我的影像。" }] },
+        { "word": "discrepancy", "ipa": "/dɪˈskrepənsi/", "meaning": "差异；不一致", "category": "TEM-8", "examples": [{ "en": "There is a slight discrepancy between the two accounts.", "zh": "这两个账户之间有轻微的出入。" }, { "en": "We need to investigate the discrepancy in the financial reports.", "zh": "我们需要调查财务报告中的不一致之处。" }] },
+        { "word": "deteriorate", "ipa": "/dɪˈtɪəriəreɪt/", "meaning": "恶化；变坏", "category": "CET-6", "examples": [{ "en": "The weather conditions began to deteriorate rapidly.", "zh": "天气状况开始迅速恶化。" }, { "en": "His health continued to deteriorate despite the treatment.", "zh": "尽管接受了治疗，他的健康状况还是继续恶化。" }] },
+        { "word": "curtail", "ipa": "/kɜːrˈteɪl/", "meaning": "缩减；限制", "category": "TEM-8", "examples": [{ "en": "The company had to curtail its spending due to the crisis.", "zh": "由于危机，公司不得不缩减开支。" }, { "en": "The new law will curtail the power of the local government.", "zh": "新法律将限制地方政府的权力。" }] },
+        { "word": "criterion", "ipa": "/kraɪˈtɪəriən/", "meaning": "标准；准则", "category": "CET-4", "examples": [{ "en": "Academic merit is the main criterion for admission.", "zh": "学术成绩是录取的首要标准。" }, { "en": "The bank uses several criteria to evaluate loan applications.", "zh": "银行使用几项标准来评估贷款申请。" }] },
+        { "word": "comprehensive", "ipa": "/ˌkɒmprɪˈhensɪv/", "meaning": "全面的；综合的", "category": "CET-4", "examples": [{ "en": "The guide provides a comprehensive overview of the city.", "zh": "指南提供了这座城市的全面概述。" }, { "en": "We offer a comprehensive insurance package for travelers.", "zh": "我们为旅行者提供全面的保险套餐。" }] },
+        { "word": "cohesive", "ipa": "/kəʊˈhiːsɪv/", "meaning": "有凝聚力的", "category": "CET-6", "examples": [{ "en": "The team needs to be more cohesive to succeed.", "zh": "团队需要更有凝聚力才能成功。" }, { "en": "She struggled to write a cohesive argument for her essay.", "zh": "她努力为论文写出逻辑严密的论点。" }] },
+        { "word": "benchmark", "ipa": "/ˈbentʃmɑːrk/", "meaning": "基准；基准点", "category": "Business", "examples": [{ "en": "The current sales figures will be the benchmark for next year.", "zh": "目前的销售额将成为明年的基准。" }, { "en": "This car is the benchmark against which all others are measured.", "zh": "这辆车是衡量所有其他车的基准。" }] },
+        { "word": "authentic", "ipa": "/ɔːˈθentɪk/", "meaning": "真实的；可靠的", "category": "Daily", "examples": [{ "en": "The restaurant serves authentic Italian food.", "zh": "这家餐厅供应正宗的意大利菜。" }, { "en": "We need to ensure that the document is authentic.", "zh": "我们需要确保这份文件是真实的。" }] },
+        { "word": "attribute", "ipa": "/əˈtrɪbjuːt/", "meaning": "归因于；属性", "category": "CET-4", "examples": [{ "en": "She attributes her success to hard work and dedication.", "zh": "她将自己的成功归功于努力和奉献。" }, { "en": "Patience is an essential attribute for a good teacher.", "zh": "耐心是好老师必备的品质。" }] },
+        { "word": "ambiguous", "ipa": "/æmˈbɪɡjuəs/", "meaning": "模棱两可的", "category": "CET-6", "examples": [{ "en": "The wording of the agreement was intentionally ambiguous.", "zh": "协议的措辞被故意弄得模棱两可。" }, { "en": "His reply to my question was very ambiguous.", "zh": "他对我的问题的回答非常含糊。" }] },
+        { "word": "adhere", "ipa": "/ədˈhɪər/", "meaning": "坚持；遵守", "category": "CET-6", "examples": [{ "en": "All members must adhere to the rules of the club.", "zh": "所有会员必须遵守俱乐部的规定。" }, { "en": "The glue did not adhere properly to the smooth surface.", "zh": "胶水没有很好地粘在光滑的表面上。" }] },
+        { "word": "adequate", "ipa": "/ˈædɪkwət/", "meaning": "充足的；适当的", "category": "CET-4", "examples": [{ "en": "We need to ensure that we have adequate supplies of water.", "zh": "我们需要确保有充足的供水。" }, { "en": "The old heating system is no longer adequate for this house.", "zh": "旧的供暖系统已不再适合这栋房子。" }] },
+        { "word": "accumulate", "ipa": "/əˈkjuːmjəleɪt/", "meaning": "积累；堆积", "category": "CET-4", "examples": [{ "en": "Dust began to accumulate on the old bookshelves.", "zh": "旧书架上开始积满灰尘。" }, { "en": "He managed to accumulate a vast fortune through smart investments.", "zh": "他通过聪明的投资积累了巨额财富。" }] },
+        { "word": "abstract", "ipa": "/ˈæbstrækt/", "meaning": "抽象的；摘要", "category": "CET-4", "examples": [{ "en": "Freedom is an abstract concept that is hard to define.", "zh": "自由是一个难以定义的抽象概念。" }, { "en": "Please include a brief abstract at the beginning of your report.", "zh": "请在报告开头附上一段简短的摘要。" }] }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "GROUP 6",
+      "words": [
+        { "word": "yield", "ipa": "/jiːld/", "meaning": "屈服；产出", "category": "Daily", "examples": [{ "en": "After hours of questioning, the suspect finally began to yield.", "zh": "经过数小时的审问，嫌疑人终于开始屈服了。" }, { "en": "Drivers must yield to pedestrians at the crosswalk.", "zh": "驾驶员必须在人行道前礼让行人。" }] },
+        { "word": "witness", "ipa": "/ˈwɪtnəs/", "meaning": "见证；证人", "category": "Daily", "examples": [{ "en": "Several people were there to witness the historic event.", "zh": "有好几个人在那儿见证了这一历史性事件。" }, { "en": "She was called to court to serve as a witness for the defense.", "zh": "她被传唤到法庭担任辩护方的证人。" }] },
+        { "word": "withstand", "ipa": "/wɪðˈstænd/", "meaning": "经受住；承受", "category": "CET-6", "examples": [{ "en": "The bridge was designed to withstand severe earthquakes.", "zh": "这座桥的设计旨在承受剧烈的地震。" }, { "en": "Few plants can withstand the extreme cold of the Arctic.", "zh": "很少有植物能经受住北极的严寒。" }] },
+        { "word": "withdrawal", "ipa": "/wɪðˈdrɔːəl/", "meaning": "撤回；提取", "category": "Business", "examples": [{ "en": "The sudden withdrawal of funding caused the project to fail.", "zh": "资金的突然撤回导致了项目的失败。" }, { "en": "He made a large cash withdrawal from the bank today.", "zh": "他今天从银行提取了大笔现金。" }] },
+        { "word": "widespread", "ipa": "/ˈwaɪdspred/", "meaning": "广泛的；普遍的", "category": "CET-4", "examples": [{ "en": "There is widespread concern about the rising cost of living.", "zh": "人们普遍对生活成本的上涨感到担忧。" }, { "en": "The use of solar energy is becoming more widespread.", "zh": "太阳能的使用正变得越来越广泛。" }] },
+        { "word": "vibrant", "ipa": "/ˈvaɪbrənt/", "meaning": "充满活力的", "category": "Daily", "examples": [{ "en": "The city is known for its vibrant nightlife and culture.", "zh": "这座城市以其充满活力的夜生活和文化而闻名。" }, { "en": "She painted the room in a vibrant shade of orange.", "zh": "她把房间漆成了鲜艳的橘色。" }] },
+        { "word": "undergo", "ipa": "/ˌʌndərˈɡəʊ/", "meaning": "经历；遭受", "category": "CET-6", "examples": [{ "en": "The building will undergo extensive renovations next year.", "zh": "这座建筑明年将经历大规模的翻修。" }, { "en": "All new recruits must undergo rigorous physical training.", "zh": "所有新招募的人员都必须接受严格的体能训练。" }] },
+        { "word": "ultimate", "ipa": "/ˈʌltɪmət/", "meaning": "最终的；极限的", "category": "CET-4", "examples": [{ "en": "Our ultimate goal is to achieve world peace.", "zh": "我们的最终目标是实现世界和平。" }, { "en": "The mountain peak is the ultimate challenge for any climber.", "zh": "对于任何登山者来说，山峰都是极限挑战。" }] },
+        { "word": "tremendous", "ipa": "/trəˈmendəs/", "meaning": "巨大的；极好的", "category": "CET-4", "examples": [{ "en": "The explosion caused a tremendous amount of damage.", "zh": "爆炸造成了巨大的破坏。" }, { "en": "She has made tremendous progress in her studies this year.", "zh": "她今年的学习取得了巨大的进步。" }] },
+        { "word": "suspicious", "ipa": "/səˈspɪʃəs/", "meaning": "怀疑的；可疑的", "category": "Emotions", "examples": [{ "en": "The neighbors became suspicious of the strangers in the alley.", "zh": "邻居们对小巷里的陌生人产生了怀疑。" }, { "en": "The police are investigating a suspicious package left at the station.", "zh": "警察正在调查留在车站的一个可疑包裹。" }] },
+        { "word": "surplus", "ipa": "/ˈsɜːrpləs/", "meaning": "盈余；过剩", "category": "Business", "examples": [{ "en": "The country has a trade surplus for the first time in years.", "zh": "该国多年来首次出现贸易顺差。" }, { "en": "The library is selling its surplus books at low prices.", "zh": "图书馆正以低价出售多余的藏书。" }] },
+        { "word": "subsequent", "ipa": "/ˈsʌbsɪkwənt/", "meaning": "随后的；后来的", "category": "CET-4", "examples": [{ "en": "The first meeting was successful, as were all subsequent ones.", "zh": "第一次会议很成功，随后所有的会议也都很成功。" }, { "en": "The events subsequent to the election were chaotic.", "zh": "选举之后的事件非常混乱。" }] },
+        { "word": "speculate", "ipa": "/ˈspekjuleɪt/", "meaning": "投机；推测", "category": "Business", "examples": [{ "en": "Critics began to speculate about the cause of the disaster.", "zh": "批评家们开始推测灾难的原因。" }, { "en": "Many people lost money by speculating on the property market.", "zh": "许多人通过投资房地产市场亏了钱。" }] },
+        { "word": "recession", "ipa": "/rɪˈseʃn/", "meaning": "经济衰退", "category": "Business", "examples": [{ "en": "The country is slowly recovering from a deep recession.", "zh": "该国正缓慢从严重的经济衰退中恢复。" }, { "en": "Many small businesses closed during the last global recession.", "zh": "在上次全球经济衰退期间，许多小企业倒闭了。" }] },
+        { "word": "prompt", "ipa": "/prɒmpt/", "meaning": "促使；及时的", "category": "CET-4", "examples": [{ "en": "The accident prompted a review of safety procedures.", "zh": "事故促使对安全程序进行审查。" }, { "en": "We expect a prompt response to our inquiry.", "zh": "我们期待对我们的查询给予及时的答复。" }] },
+        { "word": "prohibit", "ipa": "/prəˈhɪbɪt/", "meaning": "禁止；阻止", "category": "CET-4", "examples": [{ "en": "Smoking is strictly prohibited in all areas of the hospital.", "zh": "医院所有区域严禁吸烟。" }, { "en": "Lack of funds will prohibit the completion of the project.", "zh": "缺乏资金将阻碍项目的完成。" }] },
+        { "word": "perceive", "ipa": "/pəˈsiːv/", "meaning": "察觉；理解", "category": "CET-6", "examples": [{ "en": "Dogs can perceive sounds that are inaudible to humans.", "zh": "狗能察觉到人类听不到的声音。" }, { "en": "The public perceives the new law as unfair.", "zh": "公众认为新法律是不公平的。" }] },
+        { "word": "notable", "ipa": "/ˈnəʊtəbl/", "meaning": "显著的；著名的", "category": "CET-4", "examples": [{ "en": "The city is notable for its beautiful historic buildings.", "zh": "这座城市以其美丽的古建筑而闻名。" }, { "en": "There has been a notable improvement in her test scores.", "zh": "她的测试成绩有了显著的提高。" }] },
+        { "word": "margin", "ipa": "/ˈmɑːrdʒɪn/", "meaning": "边缘；利润空间", "category": "CET-4", "examples": [{ "en": "Please leave a wide margin on the left side of the page.", "zh": "请在页面左侧留出宽边。" }, { "en": "The company operates on a very narrow profit margin.", "zh": "该公司的利润空间非常有限。" }] },
+        { "word": "intense", "ipa": "/ɪnˈtens/", "meaning": "强烈的；紧张的", "category": "CET-4", "examples": [{ "en": "The heat from the desert sun was becoming intense.", "zh": "沙漠阳光带来的热量正变得强烈。" }, { "en": "Competition for the job was extremely intense.", "zh": "该职位的竞争极其激烈。" }] }
       ]
     }
   ]
