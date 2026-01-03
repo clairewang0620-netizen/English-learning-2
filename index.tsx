@@ -19,6 +19,10 @@ import {
   RefreshCw
 } from 'lucide-react';
 
+// Import data directly to avoid fetch/404 issues on Cloudflare Pages
+import { vocabularyData } from './vocabulary.ts';
+import { readingData } from './reading.ts';
+
 // --- Types ---
 
 interface Example {
@@ -100,55 +104,36 @@ const App = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [wrongWords, setWrongWords] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  // Load static data with robust path handling
-  const loadData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Use absolute-ish paths to ensure root-level fetching on Cloudflare Pages
-      // Removing leading dot to handle cases where the site is at a custom domain root
-      const paths = ['vocabulary.json', 'reading.json'];
-      
-      const [vocabRes, articlesRes] = await Promise.all(
-        paths.map(path => fetch(path, { cache: 'no-store' }))
-      );
-      
-      if (!vocabRes.ok || !articlesRes.ok) {
-        const failed = [];
-        if (!vocabRes.ok) failed.push(`vocabulary.json (${vocabRes.status})`);
-        if (!articlesRes.ok) failed.push(`reading.json (${articlesRes.status})`);
-        throw new Error(`Resource missing: ${failed.join(', ')}. Please ensure JSON files are in the deployment root.`);
-      }
-
-      const vocabData = await vocabRes.json();
-      const articlesData = await articlesRes.json();
-      
-      setVocabGroups(vocabData.groups || []);
-      setArticles(articlesData || []);
-
-      const savedWrong = localStorage.getItem('lingomaster_wrong');
-      if (savedWrong) {
-        try {
-          setWrongWords(new Set(JSON.parse(savedWrong)));
-        } catch (e) {
-          console.warn("Local storage corruption, resetting error list.");
-        }
-      }
-      
-      setInitialized(true);
-    } catch (err: any) {
-      console.error("Critical Load Error:", err);
-      setError(err.message || "Network Error: Could not reach content servers.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Synchronous "loading" of imported data
   useEffect(() => {
-    loadData();
+    const initData = () => {
+      setLoading(true);
+      try {
+        // Data is now bundled, no fetch needed
+        setVocabGroups(vocabularyData.groups || []);
+        setArticles(readingData || []);
+
+        const savedWrong = localStorage.getItem('lingomaster_wrong');
+        if (savedWrong) {
+          try {
+            setWrongWords(new Set(JSON.parse(savedWrong)));
+          } catch (e) {
+            console.warn("Local storage corruption, resetting error list.");
+          }
+        }
+        
+        setInitialized(true);
+      } catch (err: any) {
+        console.error("Initialization Error:", err);
+      } finally {
+        // Add a tiny delay for smoother transition
+        setTimeout(() => setLoading(false), 800);
+      }
+    };
+
+    initData();
   }, []);
 
   useEffect(() => {
@@ -171,37 +156,8 @@ const App = () => {
         <div className="relative">
           <Loader2 className="w-16 h-16 text-emerald-600 animate-spin" />
         </div>
-        <p className="mt-6 text-lg font-bold text-slate-800 tracking-tight">Syncing Educational Assets...</p>
-        <p className="text-slate-400 text-sm mt-1 italic">Verifying production integrity</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-6 text-center z-[100]">
-        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
-          <AlertCircle className="w-10 h-10" />
-        </div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Content Synchronization Failed</h2>
-        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-8 max-w-md">
-           <p className="text-slate-600 text-sm font-mono break-words">{error}</p>
-        </div>
-        <div className="flex flex-col gap-3 w-full max-w-xs">
-          <button 
-            onClick={() => loadData()}
-            className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg"
-          >
-            <RefreshCw className="w-5 h-5" />
-            Retry Connection
-          </button>
-          <button 
-            onClick={() => window.location.reload()}
-            className="text-slate-400 hover:text-slate-600 text-sm font-bold uppercase tracking-widest"
-          >
-            Hard Reload Page
-          </button>
-        </div>
+        <p className="mt-6 text-lg font-bold text-slate-800 tracking-tight">Synchronizing Course Content...</p>
+        <p className="text-slate-400 text-sm mt-1 italic">Enterprise Build: Stable Distribution</p>
       </div>
     );
   }
@@ -214,7 +170,7 @@ const App = () => {
             Lingo<span className="text-emerald-600">Master</span>
             <span className="ml-2 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] rounded font-black uppercase tracking-widest">Enterprise</span>
           </h1>
-          <p className="text-slate-500 text-sm font-medium">Static Distribution Module</p>
+          <p className="text-slate-500 text-sm font-medium">Bundled Static Module</p>
         </div>
         
         <nav className="flex gap-1 bg-slate-200/50 p-1.5 rounded-2xl w-full md:w-fit">
@@ -252,16 +208,18 @@ const App = () => {
       </main>
       
       <footer className="py-8 border-t border-slate-100 text-center">
-        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Build ID: 20250522-DIST-STABLE</p>
+        <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Build ID: 20250522-BUNDLE-FIX</p>
       </footer>
     </div>
   );
 };
 
+// --- Sub-Modules ---
+
 const VocabularyModule = ({ groups, toggleWrongWord, wrongWords }: { groups: VocabularyGroup[], toggleWrongWord: (w: string) => void, wrongWords: Set<string> }) => {
   const [selectedWord, setSelectedWord] = useState<Word | null>(null);
 
-  if (!groups.length) return <div className="text-center py-20 text-slate-400 font-bold italic">No vocabulary units available in current distribution.</div>;
+  if (!groups.length) return <div className="text-center py-20 text-slate-400 font-bold italic">No vocabulary units available in bundle.</div>;
 
   return (
     <div className="animate-fade-in space-y-16">
@@ -643,7 +601,7 @@ const ReadingModule = ({ articles }: { articles: Article[] }) => {
             </button>
           </div>
         ))}
-        {!articles.length && <div className="col-span-full text-center py-20 text-slate-400 font-bold">No articles loaded.</div>}
+        {!articles.length && <div className="col-span-full text-center py-20 text-slate-400 font-bold">No articles bundled.</div>}
       </div>
     );
   }
