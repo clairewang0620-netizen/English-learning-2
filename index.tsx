@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { 
@@ -14,20 +13,15 @@ import {
   Star, 
   Check,
   Filter,
-  Square,
-  Activity,
   Sparkles,
   AlertCircle,
-  User,
-  UserCircle,
-  Eye, 
-  EyeOff,
   Play,
-  RotateCcw,
-  Book,
-  PenTool,
   Pause,
-  RotateCw
+  RotateCw,
+  Zap,
+  Eye,
+  EyeOff,
+  Clock
 } from 'lucide-react';
 
 // Import data directly
@@ -47,7 +41,7 @@ interface Word {
   meaning: string;
   category: string;
   examples: Example[];
-  sourceGroupId?: number; // Internal tracking
+  sourceGroupId?: number;
 }
 
 interface VocabularyGroup {
@@ -61,10 +55,11 @@ interface Article {
   title: string;
   titleZh: string;
   subtitle?: string;
+  source?: string;
+  readingTime?: string;
   imageUrl?: string;
   paragraphs: { en: string; zh: string }[];
-  keywords: { word: string; ipa: string; definition: string }[];
-  sentencePatterns?: string[];
+  keywords: { word: string; meaning: string }[];
 }
 
 type Module = 'vocabulary' | 'dictation' | 'reading';
@@ -79,6 +74,7 @@ class PodcastEngine {
   public onPlayStateChange?: (playing: boolean, text?: string) => void;
   private isInterrupted: boolean = false;
   private activeUtterances: Set<SpeechSynthesisUtterance> = new Set();
+  private keepAliveInterval: any = null;
 
   private constructor() {
     this.synth = window.speechSynthesis;
@@ -108,63 +104,60 @@ class PodcastEngine {
   stop() {
     this.isInterrupted = true;
     this.synth.cancel();
+    if (this.keepAliveInterval) {
+      clearInterval(this.keepAliveInterval);
+      this.keepAliveInterval = null;
+    }
     this.activeUtterances.clear();
     if (this.onPlayStateChange) this.onPlayStateChange(false);
   }
 
-  async speak(text: string, rate: number = 0.85, gender: NarratorGender = 'female', onFinished?: () => void) {
-    this.stop();
+  async speak(text: string, rate: number = 0.95, gender: NarratorGender = 'female', onFinished?: () => void) {
     this.isInterrupted = false;
     
     if (this.onPlayStateChange) this.onPlayStateChange(true, text);
 
+    if (this.keepAliveInterval) clearInterval(this.keepAliveInterval);
+    this.keepAliveInterval = setInterval(() => {
+      if (this.synth.speaking) {
+        this.synth.pause();
+        this.synth.resume();
+      }
+    }, 4000);
+
     const voice = this.getVoice(gender);
-    const sentences = text.split(/(?<=[.!?])\s+/);
+    const cleanText = text.replace(/\s+/g, ' ').trim();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     
-    let currentIndex = 0;
+    this.activeUtterances.add(utterance);
 
-    const playNext = () => {
-      if (this.isInterrupted || currentIndex >= sentences.length) {
-        if (!this.isInterrupted && this.onPlayStateChange) {
-          this.onPlayStateChange(false);
-        }
-        if (!this.isInterrupted && onFinished) onFinished();
-        this.activeUtterances.clear();
-        return;
+    if (voice) utterance.voice = voice;
+    utterance.lang = 'en-US';
+    utterance.rate = rate; 
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0; 
+
+    utterance.onend = () => {
+      this.activeUtterances.delete(utterance);
+      if (this.keepAliveInterval) {
+        clearInterval(this.keepAliveInterval);
+        this.keepAliveInterval = null;
       }
-
-      const content = sentences[currentIndex].trim();
-      if (!content) {
-        currentIndex++;
-        playNext();
-        return;
-      }
-
-      const utterance = new SpeechSynthesisUtterance(content);
-      this.activeUtterances.add(utterance);
-
-      if (voice) utterance.voice = voice;
-      utterance.lang = 'en-US';
-      utterance.rate = rate; 
-      utterance.pitch = 1.0;
-      utterance.volume = 0.85;
-
-      utterance.onend = () => {
-        this.activeUtterances.delete(utterance);
-        currentIndex++;
-        // Natural breath gap (approx 110ms)
-        setTimeout(playNext, 110);
-      };
-
-      utterance.onerror = () => {
-        this.activeUtterances.delete(utterance);
-        if (this.onPlayStateChange) this.onPlayStateChange(false);
-      };
-
-      this.synth.speak(utterance);
+      if (this.onPlayStateChange) this.onPlayStateChange(false);
+      if (onFinished) onFinished();
     };
 
-    playNext();
+    utterance.onerror = () => {
+      this.activeUtterances.delete(utterance);
+      if (this.keepAliveInterval) {
+        clearInterval(this.keepAliveInterval);
+        this.keepAliveInterval = null;
+      }
+      if (this.onPlayStateChange) this.onPlayStateChange(false);
+      if (onFinished) onFinished();
+    };
+
+    this.synth.speak(utterance);
   }
 }
 
@@ -176,16 +169,12 @@ const App = () => {
   const [activeModule, setActiveModule] = useState<Module>('vocabulary'); 
   const [vocabGroups, setVocabGroups] = useState<VocabularyGroup[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [playbackRate, setPlaybackRate] = useState(0.92); 
-  const [narratorGender, setNarratorGender] = useState<NarratorGender>('female');
-  
   const [wrongWords, setWrongWords] = useState<Set<string>>(new Set());
   const [intensiveWords, setIntensiveWords] = useState<Set<string>>(new Set());
   const [masteredWords, setMasteredWords] = useState<Set<string>>(new Set());
   const [visitedWords, setVisitedWords] = useState<Set<string>>(new Set());
   
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const initData = () => {
@@ -196,31 +185,23 @@ const App = () => {
       const savedIntensive = localStorage.getItem('lm_intensive');
       const savedMastered = localStorage.getItem('lm_mastered');
       const savedVisited = localStorage.getItem('lm_visited');
-      const savedRate = localStorage.getItem('lm_rate');
-      const savedGender = localStorage.getItem('lm_gender');
 
       if (savedWrong) setWrongWords(new Set(JSON.parse(savedWrong)));
       if (savedIntensive) setIntensiveWords(new Set(JSON.parse(savedIntensive)));
       if (savedMastered) setMasteredWords(new Set(JSON.parse(savedMastered)));
       if (savedVisited) setVisitedWords(new Set(JSON.parse(savedVisited)));
-      if (savedRate) setPlaybackRate(parseFloat(savedRate));
-      if (savedGender) setNarratorGender(savedGender as NarratorGender);
       
-      setInitialized(true);
       setTimeout(() => setLoading(false), 800);
     };
     initData();
   }, []);
 
   useEffect(() => {
-    if (!initialized) return;
     localStorage.setItem('lm_wrong', JSON.stringify(Array.from(wrongWords)));
     localStorage.setItem('lm_intensive', JSON.stringify(Array.from(intensiveWords)));
     localStorage.setItem('lm_mastered', JSON.stringify(Array.from(masteredWords)));
     localStorage.setItem('lm_visited', JSON.stringify(Array.from(visitedWords)));
-    localStorage.setItem('lm_rate', playbackRate.toString());
-    localStorage.setItem('lm_gender', narratorGender);
-  }, [wrongWords, intensiveWords, masteredWords, visitedWords, playbackRate, narratorGender, initialized]);
+  }, [wrongWords, intensiveWords, masteredWords, visitedWords]);
 
   const toggleSet = (set: Set<string>, setter: (s: Set<string>) => void, word: string) => {
     const next = new Set(set);
@@ -283,8 +264,6 @@ const App = () => {
         {activeModule === 'vocabulary' && (
           <VocabularyModule 
             groups={vocabGroups} 
-            playbackRate={playbackRate} 
-            gender={narratorGender}
             intensiveWords={intensiveWords}
             masteredWords={masteredWords}
             visitedWords={visitedWords}
@@ -297,53 +276,40 @@ const App = () => {
         {activeModule === 'dictation' && (
           <DictationModule 
             groups={vocabGroups} 
-            playbackRate={playbackRate} 
-            gender={narratorGender} 
             wrongWords={wrongWords}
             setWrongWords={setWrongWords}
           />
         )}
         {activeModule === 'reading' && (
-          <ReadingModule 
-            articles={articles} 
-            playbackRate={playbackRate} 
-            gender={narratorGender} 
-          />
+          <ReadingModule articles={articles} />
         )}
       </main>
     </div>
   );
 };
 
-// --- Vocabulary Module (Locked - No changes allowed here) ---
-const VocabularyModule = ({ 
-  groups, playbackRate, gender, intensiveWords, masteredWords, visitedWords, toggleSet, markVisited, setIntensiveWords, setMasteredWords 
-}: any) => {
+// --- Vocabulary Module (LOCKED - NO CHANGES) ---
+const VocabularyModule = ({ groups, intensiveWords, masteredWords, visitedWords, toggleSet, markVisited, setIntensiveWords, setMasteredWords }: any) => {
   const [selectedGroupId, setSelectedGroupId] = useState(groups[0]?.id);
   const [cardWordIdx, setCardWordIdx] = useState<number | null>(null);
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
   const [showBravo, setShowBravo] = useState(false);
   const bravoTriggeredRef = useRef<number | null>(null);
-
   const selectedGroup = groups.find((g: any) => g.id === selectedGroupId);
-
   const allAvailableCategories = useMemo(() => {
     const cats = new Set<string>();
     groups.forEach((g: VocabularyGroup) => g.words.forEach(w => cats.add(w.category)));
     const order = ['CET-4', 'CET-6', 'TEM-8', 'Business', 'Emotions', 'Daily'];
-    const friendlyLabels: Record<string, string> = { 'CET-4': 'CET-4', 'CET-6': 'CET-6', 'TEM-8': '专八', 'Business': '商务英语', 'Emotions': '情绪表达', 'Daily': '日常生活' };
+    const friendlyLabels: Record<string, string> = { 'CET-4': 'CET-4', 'CET-6': 'CET-6', 'TEM-8': '专八', 'Business': '商务', 'Emotions': '情绪', 'Daily': '日常' };
     return order.filter(id => cats.has(id)).map(id => ({ id, label: friendlyLabels[id] || id }));
   }, [groups]);
-
   const isAggregatedView = activeFilters.size > 0;
-
   const displayWordsList = useMemo(() => {
     if (!isAggregatedView) return selectedGroup?.words || [];
     const aggregated: Word[] = [];
     groups.forEach((g: VocabularyGroup) => { g.words.forEach(w => { if (activeFilters.has(w.category)) aggregated.push({ ...w, sourceGroupId: g.id }); }); });
     return aggregated;
   }, [selectedGroup, activeFilters, groups, isAggregatedView]);
-
   useEffect(() => {
     if (isAggregatedView || cardWordIdx !== null || !selectedGroup) return;
     if (bravoTriggeredRef.current === selectedGroupId) return;
@@ -355,19 +321,15 @@ const VocabularyModule = ({
       return () => clearTimeout(timer);
     }
   }, [visitedWords, masteredWords, intensiveWords, selectedGroupId, isAggregatedView, cardWordIdx]);
-
   const toggleFilter = (catId: string) => {
     const next = new Set(activeFilters);
     if (next.has(catId)) next.delete(catId); else next.add(catId);
     setActiveFilters(next);
     setCardWordIdx(null);
   };
-
   const handlePrev = () => { if (cardWordIdx !== null && cardWordIdx > 0) { setCardWordIdx(cardWordIdx - 1); markVisited(displayWordsList[cardWordIdx - 1].word); } };
   const handleNext = () => { if (cardWordIdx !== null && cardWordIdx < displayWordsList.length - 1) { setCardWordIdx(cardWordIdx + 1); markVisited(displayWordsList[cardWordIdx + 1].word); } };
-
   const currentCardWord = cardWordIdx !== null ? displayWordsList[cardWordIdx] : null;
-
   if (cardWordIdx !== null && currentCardWord) {
     return (
       <div className="animate-fade-in max-w-2xl mx-auto space-y-8 relative">
@@ -378,19 +340,19 @@ const VocabularyModule = ({
                 <div className="flex items-center gap-4 mb-2"><h2 className="text-4xl font-black text-slate-900 tracking-tighter">{currentCardWord.word}</h2><span className="text-emerald-500 font-mono text-lg font-bold">{currentCardWord.ipa}</span></div>
                 <p className="text-2xl font-black text-slate-800">{currentCardWord.meaning}</p>
               </div>
-              <button onClick={() => podcastEngine.speak(currentCardWord.word, 0.9, gender)} className="w-16 h-16 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg hover:scale-105 transition-all"><Volume2 className="w-8 h-8" /></button>
+              <button onClick={() => { podcastEngine.stop(); podcastEngine.speak(currentCardWord.word); }} className="w-16 h-16 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg hover:scale-105 transition-all"><Volume2 className="w-8 h-8" /></button>
            </div>
            <div className="space-y-6 mb-12">
-             <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 pb-2">Contextual Examples</h3>
+             <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 pb-2">Examples</h3>
              {currentCardWord.examples.map((ex: any, i: number) => (
-                <div key={i} className="bg-slate-50 p-6 rounded-2xl border-l-4 border-emerald-500 relative">
-                   <div className="flex justify-between items-start mb-2"><p className="text-lg text-slate-800 font-medium leading-relaxed pr-10">{ex.en}</p><button onClick={() => podcastEngine.speak(ex.en, 0.9, gender)} className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-all flex-shrink-0"><Volume2 className="w-4 h-4" /></button></div>
+                <div key={i} className="bg-slate-50 p-6 rounded-2xl border-l-4 border-emerald-500">
+                   <div className="flex justify-between items-start mb-2"><p className="text-lg text-slate-800 font-medium leading-relaxed pr-6">{ex.en}</p><button onClick={() => { podcastEngine.stop(); podcastEngine.speak(ex.en); }} className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-all flex-shrink-0"><Volume2 className="w-4 h-4" /></button></div>
                    <p className="text-slate-500 font-medium">{ex.zh}</p>
                 </div>
              ))}
            </div>
            <div className="grid grid-cols-2 gap-4 mb-10">
-             <button onClick={() => toggleSet(intensiveWords, setIntensiveWords, currentCardWord.word)} className={`py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${intensiveWords.has(currentCardWord.word) ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}><Star className={`w-5 h-5 ${intensiveWords.has(currentCardWord.word) ? 'fill-current' : ''}`} /> 加入强化词库</button>
+             <button onClick={() => toggleSet(intensiveWords, setIntensiveWords, currentCardWord.word)} className={`py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${intensiveWords.has(currentCardWord.word) ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}><Star className={`w-5 h-5 ${intensiveWords.has(currentCardWord.word) ? 'fill-current' : ''}`} /> 加入强化</button>
              <button onClick={() => toggleSet(masteredWords, setMasteredWords, currentCardWord.word)} className={`py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${masteredWords.has(currentCardWord.word) ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}><Check className="w-5 h-5" /> 已掌握</button>
            </div>
            <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl">
@@ -402,29 +364,28 @@ const VocabularyModule = ({
       </div>
     );
   }
-
   return (
     <div className="flex flex-col gap-6 animate-fade-in relative">
-      {showBravo && (<div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-white border-2 border-emerald-100 px-8 py-4 rounded-[2rem] shadow-2xl flex items-center gap-4 animate-fade-in"><div className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg animate-bounce"><Sparkles className="w-5 h-5" /></div><div><h4 className="font-black text-slate-900 text-lg leading-tight">Bravo! 👏</h4><p className="text-emerald-600 font-bold text-xs uppercase tracking-widest">You’ve completed this group.</p></div></div>)}
+      {showBravo && (<div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-white border-2 border-emerald-100 px-8 py-4 rounded-[2rem] shadow-2xl flex items-center gap-4 animate-fade-in"><div className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg animate-bounce"><Sparkles className="w-5 h-5" /></div><div><h4 className="font-black text-slate-900 text-lg leading-tight">Bravo! 👏</h4><p className="text-emerald-600 font-bold text-xs uppercase tracking-widest">Completed this group.</p></div></div>)}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 no-scrollbar">
         <div className="flex items-center gap-2 pr-4 border-r border-slate-200"><Filter className="w-4 h-4 text-slate-400" /><span className="text-xs font-black text-slate-400 uppercase tracking-tighter">Filter</span></div>
         <div className="flex gap-2 pl-2">
           {allAvailableCategories.map(cat => (<button key={cat.id} onClick={() => toggleFilter(cat.id)} className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${activeFilters.has(cat.id) ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white text-slate-400 border-slate-100 hover:border-emerald-200'}`}>{cat.label}</button>))}
-          {isAggregatedView && (<button onClick={() => setActiveFilters(new Set())} className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-50 border border-rose-100 hover:bg-rose-100 transition-all">Clear All</button>)}
+          {isAggregatedView && (<button onClick={() => setActiveFilters(new Set())} className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-rose-500 bg-rose-50 border border-rose-100 hover:bg-rose-100 transition-all">Clear</button>)}
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {!isAggregatedView && (<aside className="lg:col-span-1 space-y-1.5 h-fit lg:sticky lg:top-4"><h3 className="text-[10px] font-black text-emerald-600/60 uppercase tracking-[0.2em] px-3 mb-3 italic">Study Groups</h3><div className="flex flex-col gap-1">{groups.map((group: any) => (<button key={group.id} onClick={() => { setSelectedGroupId(group.id); setCardWordIdx(null); }} className={`w-full text-left px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${selectedGroupId === group.id ? 'bg-emerald-100/60 text-emerald-700 font-bold shadow-sm' : 'text-emerald-400/80 hover:bg-emerald-50 hover:text-emerald-600'}`}>{group.name}</button>))}</div></aside>)}
         <div className={`${isAggregatedView ? 'lg:col-span-4' : 'lg:col-span-3'} space-y-3`}>
-          {displayWordsList.length > 0 ? displayWordsList.map((word: any, idx: number) => (<div key={`${word.word}-${word.sourceGroupId || selectedGroupId}`} onClick={() => { setCardWordIdx(idx); markVisited(word.word); }} className={`bg-white rounded-2xl p-5 border flex items-center justify-between group cursor-pointer transition-all hover:shadow-md ${masteredWords.has(word.word) ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-100 hover:border-emerald-300'}`}><div className="flex-1"><div className="flex items-center gap-3 mb-1"><h3 className="text-xl font-bold text-slate-800 tracking-tight">{word.word}</h3><span className="text-emerald-500 font-mono text-xs font-bold">{word.ipa}</span></div><p className="text-slate-500 font-medium">{word.meaning}</p></div><div className="flex items-center gap-3">{masteredWords.has(word.word) && <Check className="w-5 h-5 text-emerald-500 bg-emerald-50 rounded-full p-1" />}{intensiveWords.has(word.word) && <Star className="w-5 h-5 text-amber-500 fill-amber-500 bg-amber-50 rounded-full p-1" />}<button onClick={(e) => { e.stopPropagation(); podcastEngine.speak(word.word, 0.9, gender); }} className="p-3 rounded-xl bg-slate-50 text-slate-400 hover:bg-emerald-600 hover:text-white transition-all"><Volume2 className="w-5 h-5" /></button></div></div>)) : (<div className="text-center py-24 bg-white rounded-[3rem] border border-dashed border-slate-200"><Filter className="w-16 h-16 text-slate-100 mx-auto mb-4" /><p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No entries found for this selection.</p><button onClick={() => setActiveFilters(new Set())} className="mt-4 text-emerald-600 font-black text-[10px] uppercase tracking-widest underline decoration-2 underline-offset-4">Reset Filters</button></div>)}
+          {displayWordsList.length > 0 ? displayWordsList.map((word: any, idx: number) => (<div key={`${word.word}-${word.sourceGroupId || selectedGroupId}`} onClick={() => { setCardWordIdx(idx); markVisited(word.word); }} className={`bg-white rounded-2xl p-5 border flex items-center justify-between group cursor-pointer transition-all hover:shadow-md ${masteredWords.has(word.word) ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-100 hover:border-emerald-300'}`}><div className="flex-1"><div className="flex items-center gap-3 mb-1"><h3 className="text-xl font-bold text-slate-800 tracking-tight">{word.word}</h3><span className="text-emerald-500 font-mono text-xs font-bold">{word.ipa}</span></div><p className="text-slate-500 font-medium">{word.meaning}</p></div><div className="flex items-center gap-3">{masteredWords.has(word.word) && <Check className="w-5 h-5 text-emerald-500 bg-emerald-50 rounded-full p-1" />}{intensiveWords.has(word.word) && <Star className="w-5 h-5 text-amber-500 fill-amber-500 bg-amber-50 rounded-full p-1" />}<button onClick={(e) => { e.stopPropagation(); podcastEngine.stop(); podcastEngine.speak(word.word); }} className="p-3 rounded-xl bg-slate-50 text-slate-400 hover:bg-emerald-600 hover:text-white transition-all"><Volume2 className="w-5 h-5" /></button></div></div>)) : (<div className="text-center py-24 bg-white rounded-[3rem] border border-dashed border-slate-200"><Filter className="w-16 h-16 text-slate-100 mx-auto mb-4" /><p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No entries found.</p></div>)}
         </div>
       </div>
     </div>
   );
 };
 
-// --- Dictation Module (Locked - No changes allowed here) ---
-const DictationModule = ({ groups, playbackRate, gender, wrongWords, setWrongWords }: any) => {
+// --- Dictation Module (Fixed Syntax Errors) ---
+const DictationModule = ({ groups, wrongWords, setWrongWords }: any) => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [isReviewMode, setIsReviewMode] = useState(false);
   const [currentWordIdx, setCurrentWordIdx] = useState(0);
@@ -432,49 +393,228 @@ const DictationModule = ({ groups, playbackRate, gender, wrongWords, setWrongWor
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
-  const [showMeaning, setShowMeaning] = useState(false);
   const [reviewInput, setReviewInput] = useState<Record<string, string>>({});
-  const [masteredFeedback, setMasteredFeedback] = useState<string | null>(null);
+  const [showMeaningHint, setShowMeaningHint] = useState(false);
+
   const selectedGroup = groups.find((g: any) => g.id === selectedGroupId);
   const currentWord = selectedGroup?.words[currentWordIdx];
-  const mistakesList = useMemo(() => { const list: Word[] = []; groups.forEach((g: VocabularyGroup) => { g.words.forEach(w => { if (wrongWords.has(w.word)) list.push(w); }); }); return list; }, [wrongWords, groups]);
-  const handleStart = (id: number) => { setSelectedGroupId(id); setCurrentWordIdx(0); setUserInput(''); setFeedback(null); setShowResult(false); setScore(0); setIsReviewMode(false); setShowMeaning(false); };
-  const handleCheck = (e?: React.FormEvent) => { e?.preventDefault(); if (!currentWord || feedback) return; const isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase(); if (isCorrect) { setFeedback('correct'); setScore(s => s + 1); } else { setFeedback('wrong'); const nextWrong = new Set(wrongWords); nextWrong.add(currentWord.word); setWrongWords(nextWrong); localStorage.setItem('lm_wrong', JSON.stringify(Array.from(nextWrong))); } };
-  const handleNext = () => { if (currentWordIdx < selectedGroup.words.length - 1) { setCurrentWordIdx(i => i + 1); setUserInput(''); setFeedback(null); setShowMeaning(false); } else { setShowResult(true); } };
-  const handleReviewCheck = (word: Word, input: string) => { if (input.trim().toLowerCase() === word.word.toLowerCase()) { setMasteredFeedback(word.word); setTimeout(() => { const nextWrong = new Set(wrongWords); nextWrong.delete(word.word); setWrongWords(nextWrong); localStorage.setItem('lm_wrong', JSON.stringify(Array.from(nextWrong))); setMasteredFeedback(null); setReviewInput(prev => { const next = {...prev}; delete next[word.word]; return next; }); }, 1000); } };
+  
+  const mistakesList = useMemo(() => { 
+    const list: Word[] = []; 
+    groups.forEach((g: VocabularyGroup) => { 
+      g.words.forEach(w => { 
+        if (wrongWords.has(w.word)) list.push(w); 
+      }); 
+    }); 
+    return list; 
+  }, [wrongWords, groups]);
+
+  const handleStart = (id: number) => { 
+    setSelectedGroupId(id); 
+    setCurrentWordIdx(0); 
+    setUserInput(''); 
+    setFeedback(null); 
+    setShowResult(false); 
+    setScore(0); 
+    setIsReviewMode(false); 
+    setShowMeaningHint(false); 
+  };
+
+  const handleCheck = (e?: React.FormEvent) => { 
+    e?.preventDefault(); 
+    if (!currentWord || feedback) return; 
+    const isCorrect = userInput.trim().toLowerCase() === currentWord.word.toLowerCase(); 
+    if (isCorrect) { 
+      setFeedback('correct'); 
+      setScore(s => s + 1); 
+    } else { 
+      setFeedback('wrong'); 
+      const nextWrong = new Set(wrongWords); 
+      nextWrong.add(currentWord.word); 
+      setWrongWords(nextWrong); 
+    } 
+  };
+
+  const handleNext = () => { 
+    if (currentWordIdx < selectedGroup.words.length - 1) { 
+      setCurrentWordIdx(i => i + 1); 
+      setUserInput(''); 
+      setFeedback(null); 
+      setShowMeaningHint(false); 
+    } else { 
+      setShowResult(true); 
+    } 
+  };
+
+  const formatCorrectWord = (w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
 
   if (isReviewMode) {
     return (
       <div className="max-w-3xl mx-auto animate-fade-in space-y-6">
-        <button onClick={() => setIsReviewMode(false)} className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:text-slate-900 mb-6 transition-colors"><ChevronLeft className="w-4 h-4" /> Exit Review</button>
-        <h2 className="text-2xl font-black text-rose-600 italic tracking-tighter mb-8 border-b border-rose-50 pb-4">Mistake Collection</h2>
-        {mistakesList.length === 0 ? (<div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm"><Sparkles className="w-12 h-12 text-emerald-500 mx-auto mb-4" /><p className="text-slate-400 font-bold">Excellent! Your mistake collection is empty.</p></div>) : (<div className="space-y-4">{mistakesList.map((word: any, idx: number) => (<div key={idx} className="bg-white border border-slate-100 p-6 rounded-3xl flex flex-col md:flex-row gap-6 md:items-center shadow-sm hover:shadow-md transition-all relative overflow-hidden">{masteredFeedback === word.word && (<div className="absolute inset-0 bg-emerald-500/10 flex items-center justify-center z-10 backdrop-blur-[2px] animate-fade-in"><div className="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-emerald-600 font-black text-xs uppercase tracking-widest border border-emerald-100"><Check className="w-4 h-4" /> 已掌握</div></div>)}<div className="flex-1"><div className="flex items-center gap-3 mb-1"><h3 className="text-xl font-bold text-slate-800">{word.word}</h3><button onClick={() => podcastEngine.speak(word.word, 0.9, gender)} className="p-2 text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"><Volume2 className="w-4 h-4" /></button></div><p className="text-slate-500 font-medium text-sm italic">{word.meaning}</p></div><div className="flex-1"><input type="text" spellCheck={false} autoComplete="off" value={reviewInput[word.word] || ''} onChange={(e) => { const val = e.target.value; setReviewInput(prev => ({...prev, [word.word]: val})); handleReviewCheck(word, val); }} placeholder="Type to master..." className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-bold" /></div></div>))}</div>)}
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={() => setIsReviewMode(false)} className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:text-slate-900 transition-colors">
+            <ChevronLeft className="w-4 h-4" /> Exit Review
+          </button>
+          <div className="bg-rose-50 px-4 py-2 rounded-xl text-rose-600 font-bold text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" /> Mistake Collection ({mistakesList.length})
+          </div>
+        </div>
+        {mistakesList.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
+            <Sparkles className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+            <p className="text-slate-400 font-bold">Excellent! All mastered.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {mistakesList.map((word: any, idx: number) => (
+              <div key={idx} className="bg-white border border-slate-100 p-6 rounded-[2rem] flex flex-col md:flex-row gap-6 md:items-center shadow-sm">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-bold text-slate-800">{word.word}</h3>
+                    <button onClick={() => { podcastEngine.stop(); podcastEngine.speak(word.word); }} className="p-2 text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                      <Volume2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-slate-500 font-medium text-sm italic">{word.meaning}</p>
+                </div>
+                <div className="flex-1">
+                  <input 
+                    type="text" 
+                    value={reviewInput[word.word] || ''} 
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setReviewInput(prev => ({...prev, [word.word]: val}));
+                      if (val.trim().toLowerCase() === word.word.toLowerCase()) {
+                        setTimeout(() => {
+                          const nextWrong = new Set(wrongWords);
+                          nextWrong.delete(word.word);
+                          setWrongWords(nextWrong);
+                        }, 800);
+                      }
+                    }} 
+                    placeholder="Type to clear..." 
+                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-bold transition-all" 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
+
   if (showResult) {
     return (
-      <div className="max-w-md mx-auto text-center py-20 bg-white rounded-[3rem] shadow-xl border border-slate-100 animate-fade-in"><div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6"><Sparkles className="w-10 h-10" /></div><h2 className="text-3xl font-black text-slate-800 mb-2">Practice Done!</h2><p className="text-slate-400 font-medium mb-10">You got {score} / {selectedGroup.words.length} correct.</p><div className="flex flex-col gap-3 px-10"><button onClick={() => setSelectedGroupId(null)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl">Return to Selection</button>{wrongWords.size > 0 && (<button onClick={() => setIsReviewMode(true)} className="w-full py-4 bg-rose-50 text-rose-600 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-rose-100 transition-all border border-rose-100">Review Mistakes ({wrongWords.size})</button>)}</div></div>
+      <div className="max-w-md mx-auto text-center py-20 bg-white rounded-[3rem] shadow-xl border border-slate-100 animate-fade-in">
+        <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Sparkles className="w-10 h-10" />
+        </div>
+        <h2 className="text-3xl font-black text-slate-800 mb-2">Practice Done!</h2>
+        <p className="text-slate-400 font-medium mb-10">You got {score} / {selectedGroup.words.length} correct.</p>
+        <div className="flex flex-col gap-3 px-10">
+          <button onClick={() => setSelectedGroupId(null)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl">Back to Selection</button>
+          {wrongWords.size > 0 && (
+            <button onClick={() => setIsReviewMode(true)} className="w-full py-4 bg-rose-50 text-rose-600 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-rose-100 border border-rose-100">Review Mistakes ({wrongWords.size})</button>
+          )}
+        </div>
+      </div>
     );
   }
+
   if (selectedGroupId && currentWord) {
-    const formattedCorrectAnswer = currentWord.word.charAt(0).toUpperCase() + currentWord.word.slice(1).toLowerCase();
     return (
-      <div className="max-w-2xl mx-auto animate-fade-in"><div className="flex items-center justify-between mb-8 px-4"><button onClick={() => setSelectedGroupId(null)} className="text-slate-400 hover:text-slate-600 transition-colors"><X className="w-6 h-6" /></button><div className="bg-emerald-50 px-4 py-1.5 rounded-full text-emerald-600 font-black text-[10px] uppercase tracking-widest border border-emerald-100 shadow-sm">{currentWordIdx + 1} / {selectedGroup.words.length}</div></div><div className="bg-white rounded-[3rem] p-10 md:p-16 shadow-xl border border-slate-50 text-center relative overflow-hidden">{feedback === 'correct' && <div className="absolute top-0 inset-x-0 h-2 bg-emerald-500 animate-pulse"></div>}{feedback === 'wrong' && <div className="absolute top-0 inset-x-0 h-2 bg-rose-400"></div>}<button onClick={() => podcastEngine.speak(currentWord.word, 0.9, gender)} className="w-24 h-24 bg-emerald-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 hover:scale-105 transition-all shadow-xl shadow-emerald-100 active:scale-95 group"><Volume2 className="w-10 h-10 group-hover:scale-110 transition-transform" /></button><form onSubmit={handleCheck} className="space-y-10"><input type="text" autoFocus spellCheck={false} autoComplete="off" value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Spell what you hear..." disabled={!!feedback} className={`w-full text-3xl font-black text-center border-b-2 py-5 focus:outline-none transition-all placeholder:text-slate-200 bg-transparent ${feedback === 'correct' ? 'border-emerald-500 text-emerald-600' : feedback === 'wrong' ? 'border-rose-400 text-rose-500' : 'border-slate-100 focus:border-emerald-500'}`} />{feedback === 'correct' && (<div className="animate-fade-in"><div className="flex items-center justify-center gap-2 text-emerald-600 mb-8 bg-emerald-50 py-4 px-6 rounded-2xl border border-emerald-100 inline-block"><Sparkles className="w-5 h-5" /><p className="text-xl font-black">Correct! Bravo 👏</p></div><button type="button" onClick={handleNext} className="w-full py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-lg">Next Word <ChevronRight className="w-5 h-5" /></button></div>)}{feedback === 'wrong' && (<div className="animate-fade-in space-y-6"><div className="bg-rose-50 border border-rose-100 p-8 rounded-[2.5rem] text-center shadow-sm"><div className="mb-6"><p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-1">Correct spelling:</p><p className="text-4xl font-black text-rose-600 tracking-tight">{formattedCorrectAnswer}</p></div><div className="bg-white/80 backdrop-blur p-5 rounded-2xl border border-rose-100/50 mb-4"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">🇨🇳 中文释义:</p><p className="text-lg font-bold text-slate-700">{currentWord.meaning}</p></div><p className="text-xs font-bold text-rose-400/80 flex items-center justify-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> 已加入错题集，可稍后强化练习</p></div><div className="flex flex-col sm:flex-row gap-3"><button type="button" onClick={handleNext} className="flex-1 py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all shadow-lg">Continue <ChevronRight className="w-5 h-5" /></button><button type="button" onClick={() => setIsReviewMode(true)} className="flex-1 py-5 bg-rose-100 text-rose-700 rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-2 border border-rose-200 hover:bg-rose-200 transition-all">进入错题集 <AlertCircle className="w-5 h-5" /></button></div></div>)}{!feedback && (<div className="space-y-6"><button type="submit" className="w-full py-5 bg-emerald-600 text-white rounded-[1.5rem] font-black text-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-95">Submit Spelling</button><div className="flex flex-col items-center"><button type="button" onClick={() => setShowMeaning(!showMeaning)} className="group flex items-center gap-2 text-slate-400 font-black text-[10px] uppercase tracking-[0.15em] hover:text-emerald-600 transition-colors bg-white px-4 py-2 rounded-full border border-slate-100"><Book className="w-3.5 h-3.5" /> {showMeaning ? '隐藏中文释义' : '查看中文释义'}</button>{showMeaning && (<div className="mt-5 text-slate-600 font-bold text-lg bg-emerald-50/30 py-4 px-8 rounded-2xl border border-emerald-100/50 animate-fade-in relative"><span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] bg-white border border-emerald-100 px-2 py-0.5 rounded-full text-emerald-500 font-black uppercase">Definition</span>{currentWord.meaning}</div>)}</div></div>)}</form></div></div>
+      <div className="max-w-2xl mx-auto animate-fade-in">
+        <div className="flex items-center justify-between mb-8 px-4">
+          <button onClick={() => setSelectedGroupId(null)} className="text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
+          <div className="bg-emerald-50 px-4 py-1.5 rounded-full text-emerald-600 font-black text-[10px] uppercase tracking-widest">
+            {currentWordIdx + 1} / {selectedGroup.words.length}
+          </div>
+        </div>
+        <div className="bg-white rounded-[3rem] p-10 md:p-16 shadow-xl border border-slate-50 text-center relative overflow-hidden">
+          <button onClick={() => { podcastEngine.stop(); podcastEngine.speak(currentWord.word); }} className="w-24 h-24 bg-emerald-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-xl shadow-emerald-100 active:scale-95 transition-transform">
+            <Volume2 className="w-10 h-10" />
+          </button>
+          <form onSubmit={handleCheck} className="space-y-8">
+            <div className="space-y-4">
+              <input 
+                type="text" 
+                autoFocus 
+                value={userInput} 
+                onChange={(e) => setUserInput(e.target.value)} 
+                placeholder="Type what you hear..." 
+                disabled={!!feedback} 
+                className={`w-full text-3xl font-black text-center border-b-2 py-5 focus:outline-none transition-all placeholder:text-slate-200 bg-transparent ${ feedback === 'correct' ? 'border-emerald-500 text-emerald-600' : feedback === 'wrong' ? 'border-rose-400 text-rose-500' : 'border-slate-100 focus:border-emerald-500' }`} 
+              />
+              {showMeaningHint && !feedback && (
+                <p className="text-slate-500 font-bold text-lg animate-fade-in py-2 bg-emerald-50/50 rounded-xl">{currentWord.meaning}</p>
+              )}
+            </div>
+            {feedback === 'correct' && (
+              <div className="animate-fade-in">
+                <p className="text-emerald-500 font-bold mb-6">Correct! well done.</p>
+                <button type="button" onClick={handleNext} className="w-full py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-2 hover:bg-slate-800 shadow-lg"> Next Word <ChevronRight className="w-5 h-5" /> </button>
+              </div>
+            )}
+            {feedback === 'wrong' && (
+              <div className="animate-fade-in space-y-6">
+                <div className="bg-rose-50 border border-rose-100 p-8 rounded-[2.5rem] text-center shadow-sm">
+                  <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-1">Correct Answer:</p>
+                  <p className="text-4xl font-black text-rose-600 tracking-tight mb-2">{formatCorrectWord(currentWord.word)}</p>
+                  <p className="text-slate-500 font-medium text-lg italic">{currentWord.meaning}</p>
+                </div>
+                <button type="button" onClick={handleNext} className="w-full py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-2 hover:bg-slate-800 shadow-lg"> Continue <ChevronRight className="w-5 h-5" /> </button>
+              </div>
+            )}
+            {!feedback && (
+              <div className="flex flex-col gap-4">
+                <button type="submit" className="w-full py-5 bg-emerald-600 text-white rounded-[1.5rem] font-black text-lg hover:bg-emerald-700 shadow-lg active:scale-95 transition-all">Submit</button>
+                <button type="button" onClick={() => setShowMeaningHint(!showMeaningHint)} className="flex items-center gap-2 mx-auto text-slate-400 hover:text-emerald-600 font-black text-[10px] uppercase tracking-widest transition-colors">
+                  {showMeaningHint ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />} {showMeaningHint ? '隐藏中文释义' : '查看中文释义'}
+                </button>
+              </div>
+            )}
+          </form>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="animate-fade-in space-y-8"><div className="flex justify-between items-center px-1"><h2 className="text-2xl font-black text-slate-900 italic tracking-tighter">Dictation Practice</h2>{wrongWords.size > 0 && (<button onClick={() => setIsReviewMode(true)} className="flex items-center gap-2 px-5 py-2.5 bg-rose-50 text-rose-700 rounded-xl font-black text-[10px] uppercase tracking-widest border border-rose-100 hover:bg-rose-100 transition-colors shadow-sm"><AlertCircle className="w-4 h-4" /> Mistake Collection ({wrongWords.size})</button>)}</div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{groups.map((group: any) => (<button key={group.id} onClick={() => handleStart(group.id)} className="p-8 bg-white rounded-[2.5rem] border border-slate-100 text-left hover:border-emerald-300 hover:shadow-xl transition-all group shadow-sm"><div className="w-14 h-14 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors"><Headphones className="w-7 h-7" /></div><h3 className="text-xl font-black text-slate-800 mb-1">{group.name}</h3><p className="text-slate-400 text-sm font-medium mb-8">{group.words.length} Vocabulary Items</p><div className="flex items-center text-emerald-600 text-xs font-black gap-2 uppercase tracking-widest">Start Session <ChevronRight className="w-4 h-4" /></div></button>))}</div></div>
+    <div className="animate-fade-in space-y-8">
+      <div className="flex justify-between items-center px-1">
+        <h2 className="text-2xl font-black text-slate-900 italic tracking-tighter">Dictation Practice</h2>
+        {wrongWords.size > 0 && (
+          <button onClick={() => setIsReviewMode(true)} className="flex items-center gap-2 px-5 py-2.5 bg-rose-50 text-rose-700 rounded-xl font-black text-[10px] uppercase tracking-widest border border-rose-100 shadow-sm hover:bg-rose-100 transition-colors">
+            <AlertCircle className="w-4 h-4" /> Mistake Collection ({wrongWords.size})
+          </button>
+        )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {groups.map((group: any) => (
+          <button key={group.id} onClick={() => handleStart(group.id)} className="p-8 bg-white rounded-[2.5rem] border border-slate-100 text-left hover:border-emerald-300 transition-all group shadow-sm">
+            <div className="w-14 h-14 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mb-6 group-hover:text-emerald-600 transition-colors">
+              <Headphones className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-black text-slate-800 mb-1">{group.name}</h3>
+            <p className="text-slate-400 text-sm font-medium mb-8">{group.words.length} Vocabulary Items</p>
+            <div className="flex items-center text-emerald-600 text-xs font-black gap-2 uppercase tracking-widest">
+              Start Practice <ChevronRight className="w-4 h-4" />
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 };
 
-// --- Reading Module (Refined Exquisite Layout) ---
-const ReadingModule = ({ articles, playbackRate, gender }: any) => {
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
-  
-  const [paraState, setParaState] = useState<Record<number, {
-    isPlaying: boolean;
+// --- Article Detail Component (Ensures strict state isolation) ---
+const ArticleDetailView = ({ article, onBack }: any) => {
+  const [activeParaIdx, setActiveParaIdx] = useState<number | null>(null);
+  const [isReadingFull, setIsReadingFull] = useState(false);
+  const isReadingFullRef = useRef(false);
+
+  const [paraStates, setParaStates] = useState<Record<number, {
     isRecording: boolean;
     showTranslation: boolean;
     recordedUrl: string | null;
@@ -484,241 +624,223 @@ const ReadingModule = ({ articles, playbackRate, gender }: any) => {
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
-  const selectedArticle = articles.find((a: any) => a.id === selectedArticleId);
-
   const updateState = (idx: number, patch: any) => {
-    setParaState(prev => ({
+    setParaStates(prev => ({
       ...prev,
-      [idx]: { ...(prev[idx] || { isPlaying: false, isRecording: false, showTranslation: false, recordedUrl: null }), ...patch }
+      [idx]: { ...(prev[idx] || { isRecording: false, showTranslation: false, recordedUrl: null }), ...patch }
     }));
   };
 
-  const handleTogglePlay = (idx: number, text: string) => {
-    const isCurrentlyPlaying = paraState[idx]?.isPlaying;
+  const stopAll = () => {
     podcastEngine.stop();
-    
-    Object.keys(paraState).forEach(k => {
-      if (parseInt(k) !== idx) updateState(parseInt(k), { isPlaying: false });
-    });
-
-    if (!isCurrentlyPlaying) {
-      updateState(idx, { isPlaying: true });
-      podcastEngine.speak(text, 0.85, gender, () => {
-        updateState(idx, { isPlaying: false });
-      });
-    } else {
-      updateState(idx, { isPlaying: false });
+    setIsReadingFull(false);
+    isReadingFullRef.current = false;
+    setActiveParaIdx(null);
+    if (audioPlayerRef.current) audioPlayerRef.current.pause();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
     }
   };
 
-  const handleToggleShadow = async (idx: number) => {
-    const isCurrentlyRecording = paraState[idx]?.isRecording;
+  const handlePlayFull = async () => {
+    if (isReadingFull) {
+      stopAll();
+      return;
+    }
+    stopAll();
+    setIsReadingFull(true);
+    isReadingFullRef.current = true;
+    for (let i = 0; i < article.paragraphs.length; i++) {
+      if (!isReadingFullRef.current) break;
+      setActiveParaIdx(i);
+      await new Promise<void>(resolve => {
+        podcastEngine.speak(article.paragraphs[i].en, 0.95, 'female', () => resolve());
+      });
+      if (isReadingFullRef.current && i < article.paragraphs.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
+    }
+    if (isReadingFullRef.current) {
+      setIsReadingFull(false);
+      isReadingFullRef.current = false;
+      setActiveParaIdx(null);
+    }
+  };
 
-    if (!isCurrentlyRecording) {
-      try {
+  const handlePlayPara = (idx: number, text: string) => {
+    if (activeParaIdx === idx && !isReadingFull) {
+      stopAll();
+      return;
+    }
+    stopAll();
+    setActiveParaIdx(idx);
+    podcastEngine.speak(text, 0.95, 'female', () => {
+       if (!isReadingFullRef.current) setActiveParaIdx(null);
+    });
+  };
+
+  const handleRecord = async (idx: number) => {
+    const state = paraStates[idx] || { isRecording: false };
+    if (state.isRecording) {
+        stopAll();
+        return;
+    }
+    stopAll();
+    setActiveParaIdx(idx);
+    try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorderRef.current = new MediaRecorder(stream);
         audioChunksRef.current = [];
-
         mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
         mediaRecorderRef.current.onstop = () => {
-          const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          const url = URL.createObjectURL(blob);
-          updateState(idx, { recordedUrl: url });
+            const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+            updateState(idx, { recordedUrl: url, isRecording: false });
         };
-
-        setTimeout(() => {
-          mediaRecorderRef.current?.start();
-          updateState(idx, { isRecording: true });
-        }, 150);
-      } catch (err) {
-        console.error('Mic access denied:', err);
-      }
-    } else {
-      mediaRecorderRef.current?.stop();
-      mediaRecorderRef.current?.stream.getTracks().forEach(t => t.stop());
-      updateState(idx, { isRecording: false });
+        mediaRecorderRef.current.start();
+        updateState(idx, { isRecording: true });
+    } catch (err) { 
+        console.error('Mic access denied:', err); 
     }
   };
 
   const handleCheckShadow = (url: string) => {
+    stopAll();
     if (audioPlayerRef.current) {
       audioPlayerRef.current.src = url;
       audioPlayerRef.current.play();
     }
   };
 
-  if (selectedArticle) {
-    return (
-      <div className="max-w-2xl mx-auto animate-fade-in pb-32">
-        <audio ref={audioPlayerRef} className="hidden" />
-        <div className="flex items-center justify-between mb-12 px-2">
-          <button onClick={() => { setSelectedArticleId(null); podcastEngine.stop(); }} className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-bold uppercase tracking-[0.2em] text-[10px] transition-colors">
-            <ChevronLeft className="w-4 h-4" /> Return to List
-          </button>
+  return (
+    <div className="max-w-2xl mx-auto animate-fade-in pb-32">
+      <audio ref={audioPlayerRef} className="hidden" />
+      
+      {/* Navbar */}
+      <div className="flex items-center justify-between mb-12 px-2 sticky top-0 bg-[#f8fafc]/90 backdrop-blur-md z-20 py-4 border-b border-slate-100/50">
+        <button onClick={onBack} className="flex items-center gap-1.5 text-slate-400 hover:text-slate-950 font-bold uppercase tracking-[0.2em] text-[10px] transition-all">
+          <ChevronLeft className="w-3.5 h-3.5" /> Back
+        </button>
+        <button 
+          onClick={handlePlayFull}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-full shadow-sm transition-all active:scale-95 ${
+            isReadingFull ? 'bg-rose-500 text-white' : 'bg-slate-900 text-white hover:bg-slate-800'
+          }`}
+        >
+          {isReadingFull ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+          <span className="text-[10px] font-black uppercase tracking-[0.1em]">{isReadingFull ? 'Stop' : '全文发音'}</span>
+        </button>
+      </div>
+
+      {/* Header */}
+      <div className="mb-14 px-6 text-center">
+        <h1 className="text-2xl md:text-4xl font-bold text-slate-950 mb-6 leading-[1.2] font-serif-magazine tracking-tight">
+          {article.title}
+        </h1>
+        <p className="text-slate-500 text-base font-serif italic mb-8 leading-relaxed max-w-xl mx-auto opacity-80">
+          {article.subtitle}
+        </p>
+        <div className="flex items-center justify-center gap-4 text-[9px] font-black uppercase tracking-widest text-slate-300">
+           <Clock className="w-3 h-3" /> {article.readingTime || '5 min read'}
         </div>
+        <div className="h-px w-12 bg-slate-200 mx-auto mt-10"></div>
+      </div>
 
-        <div className="mb-12 px-2 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight font-serif-magazine tracking-tight">
-            {selectedArticle.title}
-          </h1>
-          <p className="text-sm text-slate-400 font-serif italic mb-6">
-            {selectedArticle.subtitle}
-          </p>
-          <div className="h-px w-12 bg-slate-200 mx-auto mb-10"></div>
-        </div>
-
-        {/* Featured Image - Exquisite Small Version */}
-        {selectedArticle.imageUrl && (
-          <div className="px-2 mb-16">
-             <img 
-              src={selectedArticle.imageUrl} 
-              alt={selectedArticle.title} 
-              className="w-full h-[380px] object-cover rounded-xl shadow-lg grayscale-[0.05] contrast-[1.02]" 
-            />
-          </div>
-        )}
-
-        <div className="space-y-16 mb-24 article-text px-4">
-          {selectedArticle.paragraphs.map((para: any, i: number) => {
-            const state = paraState[i] || { isPlaying: false, isRecording: false, showTranslation: false, recordedUrl: null };
-            return (
-              <div key={i} className="relative">
-                {/* Visual Action Buttons - Smaller & Emerald Green */}
-                <div className="flex items-center gap-3 mb-5">
-                  <button 
-                    onClick={() => handleTogglePlay(i, para.en)}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all ${
-                      state.isPlaying 
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' 
-                      : 'bg-white text-emerald-600 border-emerald-100 hover:border-emerald-500'
-                    }`}
-                  >
-                    {state.isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 fill-current" />}
-                    <span>{state.isPlaying ? 'Stop' : 'Listen'}</span>
+      {/* Content */}
+      <div className="space-y-10 px-6">
+        {article.paragraphs.map((para: any, i: number) => {
+          const state = paraStates[i] || { isRecording: false, showTranslation: false, recordedUrl: null };
+          const isActive = activeParaIdx === i;
+          return (
+            <div key={i} className="group relative flex flex-col md:flex-row gap-6 items-start">
+              <div className="order-1 md:order-2 flex flex-row md:flex-col gap-2 md:sticky md:top-32 w-full md:w-fit justify-center md:justify-start">
+                <button onClick={() => handlePlayPara(i, para.en)} className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${isActive && !state.isRecording ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-400 hover:text-emerald-600 border-slate-100'}`}>
+                  {isActive && !state.isRecording ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                </button>
+                <button onClick={() => handleRecord(i)} className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${state.isRecording ? 'bg-rose-500 text-white border-rose-500 animate-pulse' : 'bg-white text-slate-400 hover:text-rose-600 border-slate-100'}`}>
+                  <Mic className="w-3.5 h-3.5" />
+                </button>
+                <button disabled={!state.recordedUrl} onClick={() => handleCheckShadow(state.recordedUrl!)} className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${!state.recordedUrl ? 'opacity-20 cursor-not-allowed bg-slate-50 text-slate-200 border-transparent' : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50'}`}>
+                  <RotateCw className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="order-2 md:order-1 flex-1">
+                 <p className={`text-lg md:text-xl leading-[1.6] font-serif-magazine antialiased transition-colors duration-500 ${isActive ? 'text-slate-950 font-medium' : 'text-slate-700'}`}>
+                  {para.en}
+                </p>
+                <div className="mt-4">
+                  <button onClick={() => updateState(i, { showTranslation: !state.showTranslation })} className="mb-3 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 hover:text-slate-900 transition-all">
+                      {state.showTranslation ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />} {state.showTranslation ? 'Hide' : 'Translation'}
                   </button>
-                  
-                  <button 
-                    onClick={() => handleToggleShadow(i)}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all ${
-                      state.isRecording 
-                      ? 'bg-rose-500 text-white border-rose-500 animate-pulse shadow-md' 
-                      : 'bg-white text-emerald-600 border-emerald-100 hover:border-emerald-500'
-                    }`}
-                  >
-                    <Mic className="w-3 h-3" />
-                    <span>{state.isRecording ? 'Rec...' : 'Shadow'}</span>
-                  </button>
-
-                  {state.recordedUrl && (
-                    <button 
-                      onClick={() => handleCheckShadow(state.recordedUrl!)}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest border border-emerald-100"
-                    >
-                      <RotateCw className="w-3 h-3" /> Check Myself
-                    </button>
+                  {state.showTranslation && (
+                      <div className="p-5 bg-slate-50/70 rounded-xl border-l border-slate-200 animate-fade-in">
+                          <p className="text-slate-500 text-base md:text-lg leading-[1.5] italic font-serif">{para.zh}</p>
+                      </div>
                   )}
                 </div>
-                
-                <div className="space-y-6">
-                  <p className="text-lg md:text-xl text-slate-800 leading-[1.8] font-serif-magazine selection:bg-emerald-100 antialiased">
-                    {para.en}
-                  </p>
-                  
-                  <div>
-                    <button 
-                      onClick={() => updateState(i, { showTranslation: !state.showTranslation })}
-                      className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 hover:text-emerald-600 transition-colors flex items-center gap-1.5"
-                    >
-                      {state.showTranslation ? 'Hide' : 'Translation'}
-                    </button>
-                    
-                    {state.showTranslation && (
-                      <p className="mt-5 text-slate-500 text-base leading-relaxed italic bg-slate-50/50 p-6 rounded-lg border-l-2 border-emerald-100 animate-fade-in font-serif">
-                        {para.zh}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Exquisite Footer Material Section */}
-        <section className="mt-40 pt-16 border-t border-slate-100 space-y-20 px-4">
-           {selectedArticle.sentencePatterns && (
-            <div>
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-10 italic text-center">
-                Reflective Structures
-              </h3>
-              <div className="space-y-6">
-                {selectedArticle.sentencePatterns.map((pattern, idx) => (
-                  <div key={idx} className="flex items-start gap-6 group">
-                    <span className="text-[10px] font-black text-emerald-500 mt-1.5">0{idx + 1}</span>
-                    <p className="text-base text-slate-700 font-serif leading-relaxed italic pr-6 pb-6 border-b border-slate-50 w-full group-hover:border-emerald-100 transition-colors">
-                      {pattern}
-                    </p>
-                  </div>
-                ))}
               </div>
             </div>
-          )}
-
-          <div>
-            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-10 italic text-center">
-              Core Lexicon
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {selectedArticle.keywords.map((kw: any) => (
-                <div key={kw.word} className="border-b border-slate-50 pb-6 flex items-start justify-between group">
-                  <div className="pr-2">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-slate-900 text-lg tracking-tight">{kw.word}</span>
-                      <span className="text-[9px] text-emerald-500 font-mono font-black uppercase tracking-widest">{kw.ipa}</span>
-                    </div>
-                    <p className="text-xs text-slate-400 font-serif leading-relaxed italic pr-4">{kw.definition}</p>
-                  </div>
-                  <button onClick={() => podcastEngine.speak(kw.word, 0.9, gender)} className="mt-1 text-slate-200 hover:text-emerald-600 transition-colors">
-                    <Volume2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+          );
+        })}
       </div>
-    );
+
+      {/* Keywords */}
+      <section className="mt-24 pt-12 border-t border-slate-200 px-6">
+        <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] mb-10 text-center italic">Key Words</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+          {article.keywords.map((kw: any) => (
+            <div key={kw.word} className="flex items-center justify-between border-b border-slate-50 pb-5 group">
+              <div className="flex-1 pr-4">
+                <span className="font-bold text-slate-950 text-base block mb-0.5">{kw.word}</span>
+                <p className="text-xs text-slate-500 font-medium italic opacity-80">{kw.meaning}</p>
+              </div>
+              <button onClick={() => { podcastEngine.stop(); podcastEngine.speak(kw.word); }} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 hover:bg-slate-900 hover:text-white transition-all shadow-sm">
+                <Volume2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="text-center pt-20 pb-10">
+          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-2">Copyright Attribution</p>
+          <p className="text-xs text-slate-950 font-medium opacity-80">{article.source}</p>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// --- Reading Module (Main Logic) ---
+const ReadingModule = ({ articles }: any) => {
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const selectedArticle = articles.find((a: any) => a.id === selectedArticleId);
+
+  if (selectedArticleId && selectedArticle) {
+    return <ArticleDetailView key={selectedArticleId} article={selectedArticle} onBack={() => setSelectedArticleId(null)} />;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in pt-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in pt-4">
       {articles.map((article: any) => (
         <button 
           key={article.id} 
           onClick={() => setSelectedArticleId(article.id)} 
-          className="group text-left bg-transparent flex flex-col h-full overflow-hidden"
+          className="group text-left bg-white rounded-[1.8rem] shadow-sm border border-slate-100 flex flex-col h-full overflow-hidden transition-all duration-500 hover:shadow-xl hover:-translate-y-1"
         >
-          <div className="relative aspect-[4/5] mb-6 overflow-hidden rounded-2xl shadow-sm bg-slate-100">
-            <img 
-              src={article.imageUrl} 
-              className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" 
-              alt="" 
-            />
-            <div className="absolute inset-0 bg-slate-900/5 group-hover:bg-transparent transition-colors" />
+          <div className="relative aspect-[16/10] overflow-hidden bg-slate-50">
+            <img src={article.imageUrl} className="w-full h-full object-cover transition-transform duration-[6s] group-hover:scale-110" alt="" />
+            <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
           </div>
-          <div className="flex-1 px-1">
-            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-emerald-600 mb-3 inline-block italic">Essay // 特稿阅读</span>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2 leading-tight tracking-tight font-serif-magazine group-hover:underline decoration-emerald-200 underline-offset-4">
+          <div className="flex-1 px-7 py-7">
+            <h3 className="text-lg md:text-xl font-bold text-slate-950 mb-3 leading-tight tracking-tight font-serif-magazine group-hover:text-emerald-700 transition-colors">
               {article.title}
             </h3>
-            <p className="text-slate-400 text-sm font-medium italic mb-4 opacity-80">{article.titleZh}</p>
-            <p className="text-slate-400 text-xs line-clamp-2 leading-relaxed italic font-serif">
-              “{article.paragraphs[0].en.slice(0, 110)}...”
-            </p>
+            <p className="text-slate-400 text-xs font-medium italic leading-relaxed mb-4">{article.titleZh}</p>
+            <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-widest text-slate-300">
+               <Clock className="w-3 h-3" /> {article.readingTime || '5 min read'}
+            </div>
           </div>
-          <div className="mt-6 pt-5 border-t border-slate-100 flex items-center text-slate-900 text-[9px] font-black uppercase tracking-[0.2em] group-hover:text-emerald-600 transition-colors">
-            Start Reading <ChevronRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" />
+          <div className="mt-auto px-7 pb-7 pt-4 flex items-center text-slate-900 text-[9px] font-black uppercase tracking-[0.2em] group-hover:text-emerald-600 transition-colors">
+            Start Reading <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
           </div>
         </button>
       ))}
