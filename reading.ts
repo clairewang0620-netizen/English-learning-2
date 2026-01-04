@@ -1,127 +1,70 @@
 
 export const readingData = [
   {
-    "id": "article-1",
-    "title": "The Evolution of Global Finance",
-    "titleZh": "全球金融体系的演进与变革",
-    "imageUrl": "https://images.unsplash.com/photo-1611974717482-58a00000bd82?auto=format&fit=crop&q=80&w=1200",
+    "id": "article-procrastination",
+    "title": "I Want to Do Everything, So I Do Nothing",
+    "titleZh": "什么都想做，结果什么都不做",
+    "subtitle": "On midnight anxieties, career paths and the quiet panic of wanting too much",
+    "imageUrl": "https://images.unsplash.com/photo-1499209974431-9dac3adaf471?auto=format&fit=crop&q=80&w=1200",
     "paragraphs": [
       {
-        "en": "Global financial markets have undergone a profound transformation over the past decade. The rise of digital currencies and decentralized platforms is challenging traditional banking systems in ways that were previously unimaginable. While some see this as a necessary evolution, others warn of systemic risks that could destabilize international economies.",
-        "zh": "在过去的十年里，全球金融市场经历了一场深刻的变革。数字货币与去中心化平台的兴起，正以前所未有的方式冲击着传统银行体系。尽管有人将其视为时代演进的必然，但也有人警惕其中蕴含的系统性风险，担心这会动摇全球经济的稳定性。"
+        "en": "It’s midnight again, and the world outside has finally gone quiet, but inside, my mind is performing its usual ritual — the one where I try to untangle all the things I could become, and instead tie myself into knots. The lights in my room are off, but the tabs on my screen are glowing like tiny beacons of unrealized ambition.",
+        "zh": "又是深夜，窗外的世界终于静了下来。但在我的脑海里，惯常的仪式感再次上演——我试图理清自己未来可能的模样，却不觉间把自己绕进了死胡同。屋里的灯灭了，但屏幕上跳动的标签页却像微弱的灯塔，闪烁着那些尚未实现的野心。"
       },
       {
-        "en": "Central banks are now exploring their own digital offerings to maintain control over monetary policy. The shift towards 'fintech' has accelerated, with billions of dollars being poured into startups that promise faster, cheaper, and more inclusive financial services. However, regulatory frameworks are struggling to keep pace with the speed of innovation.",
-        "zh": "为了捍卫对货币政策的掌控权，各国央行纷纷开始布局官方数字货币。金融科技（Fintech）的浪潮势不可挡，海量资金涌入初创领域，力求打造更高效、更廉价且更具普惠性的金融服务。然而，现行的监管框架在日新月异的技术创新面前，显得有些应接不暇。"
+        "en": "One tab leads to travel — moving to Japan, maybe — some version of escape that feels romantic until you remember you have to pack. A few more are job listings, each more soulless than the last, but all quietly whispering, you could do this… you’d be good at it. And somewhere on my desktop, a folder labeled “Startup Ideas” waits with 17 subfolders and not a single completed concept — a graveyard of possibilities too fragile to survive the light of day.",
+        "zh": "一个标签页通向旅行——也许是搬去日本——那种逃离听起来很浪漫，直到你意识到还得收拾行李。还有几个是招聘启事，一个比一个索然无味，却都在耳边低语：你可以试试这个……你会很擅长的。桌面某个角落，一个名为“创业点子”的文件夹里塞满了17个子文件夹，却没一个是成型的——那是可能性的坟场，脆弱得见不得光。"
       },
       {
-        "en": "In the corporate sector, the focus is increasingly on sustainability and ethical investing. Investors are no longer just looking at profit margins; they are demanding transparency regarding environmental, social, and governance factors. This shift reflects a broader change in societal values, where businesses are expected to contribute positively to the world.",
-        "zh": "在企业层面，可持续发展与伦理投资正逐渐成为核心议题。投资者不再仅仅盯着利润表，而是开始要求环境、社会及公司治理（ESG）信息的透明化。这种转变折射出社会价值观的深刻变迁：人们愈发期望企业在追求商业利益的同时，也能为世界贡献正向价值。"
+        "en": "It’s not ambition I lack — not even close. What I lack is gravity. Something to hold me down, to root one version of myself long enough for it to grow. There’s a specific kind of burnout that doesn’t stem from running too hard, too fast, or too long — it comes from running in mental circles, in a hundred different directions, and getting nowhere.",
+        "zh": "我并不缺野心，一点也不。我缺的是重力——能让我沉下来的东西，能让某个版本的我扎下根来、获得成长。有种特殊的倦怠感，并非源于跑得太猛或太久，而是源于心智在原地打转，在一百个方向上耗尽力气，却哪儿也没去。"
       },
       {
-        "en": "Ultimately, the future of finance will be defined by how well we manage the balance between technological advancement and stability. Cooperation between international regulators will be essential to prevent a fragmented global system that could hinder trade and investment. The road ahead is uncertain, but the potential for growth remains immense.",
-        "zh": "归根结底，金融的未来取决于我们能否在技术进步与系统稳定之间找到完美的平衡点。加强国际监管协作至关重要，只有这样才能避免全球体系走向碎片化，从而保障贸易与投资的顺畅。尽管前路仍充满变数，但其中蕴含的增长潜力依然巨大。"
+        "en": "I believe it’s a kind of soul-exhaustion — the type that doesn’t come from physical labor or a packed calendar, but from constantly standing at the edge of all your unlived lives, wondering which one to claim. Because the moment you choose one path, you feel like you’re killing off all the others. Choosing isn’t just about commitment — it’s about mourning every version of yourself that didn’t get chosen.",
+        "zh": "我相信这是一种“灵魂虚脱”——它不来自体力劳动或密集的日程，而来自你始终站在那些“未曾体验的生活”的边缘，纠结该认领哪一种。因为当你选定一条路的那一刻，你总觉得是在扼杀其他的可能。选择，不仅关乎承诺，更关乎对那些被放弃的“自我”的哀悼。"
+      },
+      {
+        "en": "So instead of moving, I stay suspended in this quiet purgatory — a waiting room between lifetimes, where nothing hurts enough to force action, but nothing feels real enough to settle into either. Sometimes I imagine my mind as a long, dim hallway with door after door stretching into the distance, and behind each door lives a version of myself I never had the courage — or clarity — to become.",
+        "zh": "于是我止步不前，悬停在这一片寂静的炼狱里——那是不同人生之间的候车室。在这里，没什么痛到非动不可，也没什么真实到足以安身。有时我把大脑想象成一条幽暗的长廊，一扇扇门向远方延伸，每扇门后都住着一个我从未有勇气或清晰头脑去成为的自己。"
+      },
+      {
+        "en": "There’s the therapist with the calm voice and soft sweaters. The novelist who writes at golden hour and lives by the sea. The entrepreneur building something meaningful, exhausted but purposeful. The traveler who speaks three languages and owns nothing but freedom. I open these doors in my imagination like I’m touring homes I’ll never live in. I rehearse their lives in vivid detail, trying them on like costumes in a play I’ll never perform.",
+        "zh": "门后有嗓音温和、穿着柔软毛衣的心理咨询师；有在黄金时段写作、住在海边的虚构小说家；有虽疲惫却目标坚定、正创造价值的企业家；还有精通三门语言、除自由外一无所有的旅行者。我在想象中推开这些门，像是参观永远不会入住的房子。我细致入微地排演他们的一生，把这些生活像戏服一样试穿在身上，却演不出一场真正的戏。"
+      },
+      {
+        "en": "Someone once wrote that procrastination isn’t about poor time management — it’s about emotional dysregulation. And when I read that, something inside me flinched, because it felt too true to ignore. Because I’m not lazy. I’m scared — deeply, quietly, achingly scared. Scared of failing at something I actually care about. Scared of wasting years chasing the wrong dream. Scared of putting my whole self into something and discovering I’m still not enough.",
+        "zh": "曾有人写道，拖延并非源于拙劣的时间管理，而是源于情绪调节失常。读到这句话时，我的内心抽动了一下，因为它真实得无法忽视。我并不懒，我是害怕——那种深沉、寂静、令人隐隐作痛的恐惧。怕在真正在意的事情上败北，怕浪费大好年华追逐错误的梦想，怕倾尽所有后发现，自己依然不够优秀。"
+      },
+      {
+        "en": "They told us we could be anything — and meant it as a gift. But they didn’t warn us that having too many doors open makes it impossible to walk through any of them. They didn’t explain that potential can be a weight — a ghost that follows you from room to room, whispering about everything you haven’t done yet.",
+        "zh": "他们曾说“你可以成为任何想成为的人”，并将其视作馈赠。但他们没警告过，开着的门太多，反而让人哪儿也去不了。他们没解释过，潜能也会成为一种负担——它像一个幽灵，在每个房间里尾随着你，低声数落着那些你还没做成的事。"
+      },
+      {
+        "en": "I was the “gifted kid.” The one teachers praised, the one relatives bragged about at holidays, the one who always had a “bright future.” But the brightness faded under the harsh light of adult ambiguity. Now I scroll job boards like they’re tarot cards, asking them to show me who I’m meant to be. Now I edit my portfolio more than I send it, hoping perfection will save me from rejection.",
+        "zh": "我曾是那个“天赋异禀的孩子”。受老师夸奖，被亲戚在节日里显摆，总被许以“光明的前程”。但这种光芒在成年世界那刺眼的迷茫感下褪了色。现在，我像翻看塔罗牌一样刷着招聘网站，乞求它们告诉我命中注定是谁。我修改作品集的时间远多于投递的时间，总幻想着用“完美”来抵御“拒绝”。"
+      },
+      {
+        "en": "Maybe life isn’t asking for us to figure everything out. Maybe it’s asking us to stay in motion, to keep reaching through the fog even if the path ahead doesn’t yet have a name. If you, too, are stuck in the hallway between versions of yourself — I want to tell you: You’re not alone. You’re not lazy. You’re not behind. You’re just waiting to remember who you are.",
+        "zh": "也许生活并不要求我们将一切看透。也许它只要求我们保持前行，在迷雾中不断探索，即便前路尚未被命名。如果你也困在了不同版本自我的长廊中——我想告诉你：你并不孤单，你并不懒惰，你也没有落后。你只是在等待，等待重新想起自己是谁。"
+      },
+      {
+        "en": "We don’t need to figure everything out tonight. We don’t need to build empires by morning. We don’t even need to pick the perfect path. We just need to do one real thing. Something small. Something honest. Something that says, I’m here, and I’m trying. Not a master plan — but a flicker. A match. A breath.",
+        "zh": "我们不需要在今晚想通所有事。我们不需要在黎明前筑起帝国。我们甚至不需要选出那条最完美的路径。我们只需要做一件真实的事。一件小事，一件诚实的事，一件能证明“我在这里，我在努力”的事。不是宏大的蓝图——而是一个火星。一支火柴。一次呼吸。"
       }
     ],
     "keywords": [
-      { "word": "decentralized", "ipa": "/ˌdiːˈsentrəlaɪzd/", "definition": "去中心化的" },
-      { "word": "systemic", "ipa": "/sɪˈstemɪk/", "definition": "系统性的" },
-      { "word": "fintech", "ipa": "/ˈfɪntek/", "definition": "金融科技" },
-      { "word": "regulatory", "ipa": "/ˈreɡjələtɔːri/", "definition": "监管的" },
-      { "word": "transparency", "ipa": "/trænsˈpærənsi/", "definition": "透明度" }
-    ]
-  },
-  {
-    "id": "article-2",
-    "title": "Artificial Intelligence in the Modern Workplace",
-    "titleZh": "人工智能：重塑现代职场新格局",
-    "imageUrl": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1200",
-    "paragraphs": [
-      {
-        "en": "Artificial intelligence is no longer a futuristic concept; it is already reshaping the modern workplace. From automating repetitive tasks to providing deep data insights, AI tools are helping businesses operate with unprecedented efficiency. This shift, however, raises important questions about the future of human labor and the skills required in the 21st century.",
-        "zh": "人工智能早已不再是遥不可及的科幻概念，它正实实在在地重塑着现代职场。从自动化处理机械性工作到提供深度的洞察分析，AI工具正助力企业实现效率的跨越式提升。然而，这一变革也引发了人们对未来劳动力市场及21世纪人才核心素养的深刻反思。"
-      },
-      {
-        "en": "Many experts argue that AI will not replace humans but rather augment our capabilities. By handling mundane work, AI allows employees to focus on creative problem-solving and strategic thinking. Nevertheless, there is a growing consensus that large-scale reskilling programs will be necessary to prevent widespread unemployment in traditional sectors.",
-        "zh": "不少专家指出，AI并非要取代人类，而是要成为人类能力的“放大器”。通过分担那些枯燥乏味的工作，AI让员工能腾出精力去攻克创意难题和进行战略思考。即便如此，社会各界已达成共识：必须开展大规模的技能再培训计划，以缓解传统行业可能出现的失业风险。"
-      },
-      {
-        "en": "Ethical considerations are also at the forefront of the AI debate. Issues such as algorithmic bias and data privacy must be addressed to ensure that AI systems are fair and trustworthy. Companies that prioritize ethical AI development are likely to gain a competitive advantage by building stronger relationships with their customers and employees.",
-        "zh": "伦理考量同样处于AI争议的风口浪尖。算法偏见和数据隐私等问题必须得到妥善解决，以确保AI系统的公正与可靠。那些将伦理开发放在首位的企业，往往能通过建立深厚的内外部信任，在激烈的市场竞争中脱颖而出。"
-      },
-      {
-        "en": "As we move forward, the successful integration of AI will depend on human-centric design. We must ensure that technology serves to enhance human well-being rather than just maximizing productivity. The dialogue between policymakers, technologists, and the public will be crucial in shaping an AI-driven future that benefits everyone.",
-        "zh": "展望未来，AI的成功整合将取决于“以人为本”的设计理念。我们必须确保技术进步的初衷是增进人类福祉，而非仅仅追求生产力的最大化。决策者、技术专家与公众之间的持续对话，将共同勾勒出一个普惠大众的AI驱动型未来。"
-      }
+      { "word": "procrastination", "ipa": "/prəˌkræstɪˈneɪʃn/", "definition": "拖延症：因情绪调节困难而推迟行动的心里倾向。" },
+      { "word": "dysregulation", "ipa": "/ˌdɪsˌreɡjuˈleɪʃn/", "definition": "调节障碍：无法有效管控内在情绪状态或冲动。" },
+      { "word": "purgatory", "ipa": "/ˈpɜːrɡətɔːri/", "definition": "炼狱：比喻一种极度纠结、停滞不前的中间地带。" },
+      { "word": "unrealized", "ipa": "/ˌʌnˈriːəlaɪzd/", "definition": "未实现的：野心或计划仅停留在构想阶段。" },
+      { "word": "ambiguity", "ipa": "/ˌæmbɪˈɡjuːəti/", "definition": "模棱两可：成年世界中缺乏明确指引的不确定感。" },
+      { "word": "liminal", "ipa": "/ˈlɪmɪnl/", "definition": "阈限的：处于两者之间、边界模糊的过渡状态。" },
+      { "word": "vulnerable", "ipa": "/ˈvʌlnərəbl/", "definition": "脆弱的：在追求梦想时感到容易受挫或失败。" }
     ],
-    "keywords": [
-      { "word": "augment", "ipa": "/ɔːɡˈment/", "definition": "增强" },
-      { "word": "mundane", "ipa": "/mʌnˈdeɪn/", "definition": "平凡的" },
-      { "word": "consensus", "ipa": "/kənˈsensəs/", "definition": "共识" },
-      { "word": "algorithmic", "ipa": "/ˌælɡəˈrɪðmɪk/", "definition": "算法的" },
-      { "word": "integration", "ipa": "/ˌɪntɪˈɡreɪʃn/", "definition": "整合" }
-    ]
-  },
-  {
-    "id": "article-3",
-    "title": "Mastering Your New Year Resolutions",
-    "titleZh": "新年目标管理：从愿望到现实的跨越",
-    "imageUrl": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&q=80&w=1200",
-    "paragraphs": [
-      {
-        "en": "The start of a new year offers a unique psychological 'fresh start' effect. This sense of a clean slate often provides the surge of motivation needed to set ambitious goals and discard old habits. However, research suggests that the majority of resolutions are abandoned by mid-February due to a lack of structured planning.",
-        "zh": "新年的开启往往会带来一种独特的心理暗示——“重新开始”。这种万象更新的感觉赋予了人们设定宏伟目标、摒弃陈年旧习的动力。然而研究表明，由于缺乏系统性的规划，绝大多数的新年决心在二月中旬便会悄然夭折。"
-      },
-      {
-        "en": "To ensure long-term success, experts recommend adopting the SMART criteria: goals should be Specific, Measurable, Achievable, Relevant, and Time-bound. Instead of a vague desire to 'get fit,' try a concrete target like 'walking for 30 minutes every morning.' This clarity makes it much easier to track progress and stay accountable.",
-        "zh": "为了确保计划能持之以恒，专家建议采用“SMART原则”：即目标必须是具体的、可衡量的、可实现的、相关的且有时限的。与其模糊地想要“健身”，不如设定一个“每天早起散步30分钟”的明确指标。清晰的目标能让进度追踪变得简单，从而更好地自我督促。"
-      },
-      {
-        "en": "Another crucial strategy is to prioritize consistency over intensity. Many people start with extreme changes that are impossible to maintain in their daily routines. Building small, sustainable habits creates a compounding effect that leads to significant results over time. Remember, the journey of personal growth is a marathon, not a sprint.",
-        "zh": "另一项核心策略是：频率胜过强度。许多人一上来就大刀阔斧地改变，却发现这些尝试根本无法融入日常生活。事实上，培养微小且可持续的习惯会产生“复利效应”，随着时间的推移带来惊人的改变。请记住，个人成长是一场马拉松，而非百米冲刺。"
-      },
-      {
-        "en": "Finally, it is important to treat setbacks as learning opportunities rather than reasons to quit. Life is unpredictable, and perfect compliance is rarely possible. The most successful people are those who can quickly recalibrate their plans and keep moving forward. With patience and persistence, your new year plans can transform from fleeting dreams into lasting reality.",
-        "zh": "最后，要学会将挫折视为学习契机，而非放弃的借口。生活总有意外，完美的执行几乎是不存在的。真正的成功者懂得在偏离航线时迅速调整，并继续前行。只要多一点耐心与韧性，你的新年愿望终将从遥不可及的梦想转化为触手可及的现实。"
-      }
-    ],
-    "keywords": [
-      { "word": "ambitious", "ipa": "/æmˈbɪʃəs/", "definition": "有雄心的" },
-      { "word": "accountable", "ipa": "/əˈkaʊntəbl/", "definition": "负有责任的" },
-      { "word": "consistency", "ipa": "/kənˈsɪstənsi/", "definition": "一致性" },
-      { "word": "compounding", "ipa": "/kəmˈpaʊndɪŋ/", "definition": "复合的" },
-      { "word": "recalibrate", "ipa": "/ˌriːˈkælɪbreɪt/", "definition": "重新校准" }
-    ]
-  },
-  {
-    "id": "article-4",
-    "title": "The Paradox of Choice: Doing Everything and Nothing",
-    "titleZh": "选择的悖论：为何在无限可能中感到无力",
-    "imageUrl": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1200",
-    "paragraphs": [
-      {
-        "en": "In the modern information age, we are constantly bombarded with infinite choices and opportunities. While this freedom seems beneficial, it often leads to a paralyzing state of indecision. When we try to keep every door open and pursue every interesting lead, we frequently find ourselves spread too thin to make meaningful progress on any single front.",
-        "zh": "身处信息爆炸的时代，我们时刻被海量的选择和机遇包围。虽然这种自由看似美妙，却往往会导致令人瘫痪的“决策无力”。当我们试图抓住每一个机会、不愿关上任何一扇窗时，精力被过度分散，最终导致在任何领域都无法取得实质性进展。"
-      },
-      {
-        "en": "This phenomenon is often driven by the 'fear of missing out,' or FOMO. We worry that by committing to one path, we are sacrificing the potential benefits of all other options. This anxiety prevents us from fully engaging with our chosen tasks, leading to a shallow level of productivity and a constant sense of restlessness.",
-        "zh": "这种现象背后的推手通常是“错失恐惧症”（FOMO）。我们担心一旦选定了某条路，就意味着牺牲了其他所有可能的红利。这种焦虑让我们无法全身心地投入当下，导致工作流于表面，内心则始终被浮躁不安所占据。"
-      },
-      {
-        "en": "The illusion of multitasking further complicates the issue. We often believe that we are being productive by juggling multiple projects simultaneously, but research shows that constant task-switching significantly reduces cognitive performance. True excellence requires deep work and long periods of uninterrupted focus, which is impossible if our attention is constantly divided.",
-        "zh": "“多任务处理”的幻觉进一步加剧了问题。我们总以为同时推进多个项目效率更高，但研究表明，频繁的切换会严重损耗认知效能。真正的卓越源于深度工作和长时间的专注，如果注意力被切割得支离破碎，成功将无从谈起。"
-      },
-      {
-        "en": "The solution lies in the art of prioritization and the power of saying 'no.' By identifying our most important values and goals, we can filter out the noise and focus on what truly matters. Choosing one path often means letting go of others, but it is this very sacrifice that allows us to walk far and achieve something of lasting value.",
-        "zh": "破局之道在于“优先级”的艺术和“拒绝”的力量。只有明确内心最核心的价值和目标，我们才能过滤杂音，锁定真正重要的事情。选择某条道路必然意味着放弃其他可能，但也正是这种纯粹的舍弃，才能让我们走得更远，成就真正持久的价值。"
-      }
-    ],
-    "keywords": [
-      { "word": "paralyzing", "ipa": "/ˈpærəlaɪzɪŋ/", "definition": "使人瘫痪的" },
-      { "word": "illusion", "ipa": "/ɪˈluːʒn/", "definition": "错觉" },
-      { "word": "simultaneously", "ipa": "/ˌsaɪmlˈteɪniəsli/", "definition": "同时地" },
-      { "word": "cognitive", "ipa": "/ˈkɒɡnətɪv/", "definition": "认知的" },
-      { "word": "prioritization", "ipa": "/praɪˌɒrɪtaɪˈzeɪʃn/", "definition": "优先次序" }
+    "sentencePatterns": [
+      "It’s ... again, and ... but inside, ... is performing its usual ritual. (描述规律性出现的心理冲突)",
+      "What I lack is ... Something to hold me down, to root ... long enough for it to grow. (表达对稳定与深度连接的渴望)",
+      "Choosing isn’t just about commitment — it’s about mourning every version of yourself that didn’t get chosen. (深刻解剖选择的本质)"
     ]
   }
 ];
