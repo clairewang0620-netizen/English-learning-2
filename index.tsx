@@ -59,7 +59,7 @@ interface Article {
   readingTime?: string;
   imageUrl?: string;
   paragraphs: { en: string; zh: string }[];
-  keywords: { word: string; meaning: string }[];
+  keywords: { word: string; meaning: string; ipa?: string }[];
 }
 
 type Module = 'vocabulary' | 'dictation' | 'reading';
@@ -72,9 +72,9 @@ class PodcastEngine {
   private synth: SpeechSynthesis;
   private voices: SpeechSynthesisVoice[] = [];
   public onPlayStateChange?: (playing: boolean, text?: string) => void;
-  private isInterrupted: boolean = false;
   private activeUtterances: Set<SpeechSynthesisUtterance> = new Set();
   private keepAliveInterval: any = null;
+  private currentSessionId: number = 0;
 
   private constructor() {
     this.synth = window.speechSynthesis;
@@ -102,7 +102,7 @@ class PodcastEngine {
   }
 
   stop() {
-    this.isInterrupted = true;
+    this.currentSessionId++; 
     this.synth.cancel();
     if (this.keepAliveInterval) {
       clearInterval(this.keepAliveInterval);
@@ -113,24 +113,27 @@ class PodcastEngine {
   }
 
   async speak(text: string, rate: number = 0.95, gender: NarratorGender = 'female', onFinished?: () => void) {
-    this.isInterrupted = false;
+    this.stop(); 
     
+    const sessionId = this.currentSessionId;
+    // Strict delay for browser TTS state reset
+    await new Promise(r => setTimeout(r, 60));
+    if (sessionId !== this.currentSessionId) return;
+
     if (this.onPlayStateChange) this.onPlayStateChange(true, text);
 
-    if (this.keepAliveInterval) clearInterval(this.keepAliveInterval);
     this.keepAliveInterval = setInterval(() => {
-      if (this.synth.speaking) {
+      if (this.synth.speaking && sessionId === this.currentSessionId) {
         this.synth.pause();
         this.synth.resume();
       }
-    }, 4000);
+    }, 5000);
+
+    // Segment as a whole unit, no sentence-level splitting to ensure flow.
+    const utterance = new SpeechSynthesisUtterance(text);
+    this.activeUtterances.add(utterance); 
 
     const voice = this.getVoice(gender);
-    const cleanText = text.replace(/\s+/g, ' ').trim();
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    
-    this.activeUtterances.add(utterance);
-
     if (voice) utterance.voice = voice;
     utterance.lang = 'en-US';
     utterance.rate = rate; 
@@ -139,25 +142,31 @@ class PodcastEngine {
 
     utterance.onend = () => {
       this.activeUtterances.delete(utterance);
-      if (this.keepAliveInterval) {
-        clearInterval(this.keepAliveInterval);
-        this.keepAliveInterval = null;
+      if (sessionId === this.currentSessionId) {
+        this.cleanup(onFinished);
       }
-      if (this.onPlayStateChange) this.onPlayStateChange(false);
-      if (onFinished) onFinished();
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (event) => {
       this.activeUtterances.delete(utterance);
-      if (this.keepAliveInterval) {
-        clearInterval(this.keepAliveInterval);
-        this.keepAliveInterval = null;
+      if (event.error !== 'interrupted' && sessionId === this.currentSessionId) {
+        console.error('Speech synthesis error:', event.error);
       }
-      if (this.onPlayStateChange) this.onPlayStateChange(false);
-      if (onFinished) onFinished();
+      if (sessionId === this.currentSessionId) {
+        this.cleanup(onFinished);
+      }
     };
 
     this.synth.speak(utterance);
+  }
+
+  private cleanup(onFinished?: () => void) {
+    if (this.keepAliveInterval) {
+      clearInterval(this.keepAliveInterval);
+      this.keepAliveInterval = null;
+    }
+    if (this.onPlayStateChange) this.onPlayStateChange(false);
+    if (onFinished) onFinished();
   }
 }
 
@@ -288,7 +297,7 @@ const App = () => {
   );
 };
 
-// --- Vocabulary Module (LOCKED - NO CHANGES) ---
+// --- Vocabulary Module ---
 const VocabularyModule = ({ groups, intensiveWords, masteredWords, visitedWords, toggleSet, markVisited, setIntensiveWords, setMasteredWords }: any) => {
   const [selectedGroupId, setSelectedGroupId] = useState(groups[0]?.id);
   const [cardWordIdx, setCardWordIdx] = useState<number | null>(null);
@@ -340,13 +349,13 @@ const VocabularyModule = ({ groups, intensiveWords, masteredWords, visitedWords,
                 <div className="flex items-center gap-4 mb-2"><h2 className="text-4xl font-black text-slate-900 tracking-tighter">{currentCardWord.word}</h2><span className="text-emerald-500 font-mono text-lg font-bold">{currentCardWord.ipa}</span></div>
                 <p className="text-2xl font-black text-slate-800">{currentCardWord.meaning}</p>
               </div>
-              <button onClick={() => { podcastEngine.stop(); podcastEngine.speak(currentCardWord.word); }} className="w-16 h-16 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg hover:scale-105 transition-all"><Volume2 className="w-8 h-8" /></button>
+              <button onClick={() => { podcastEngine.speak(currentCardWord.word); }} className="w-16 h-16 bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg hover:scale-105 transition-all"><Volume2 className="w-8 h-8" /></button>
            </div>
            <div className="space-y-6 mb-12">
              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 pb-2">Examples</h3>
              {currentCardWord.examples.map((ex: any, i: number) => (
                 <div key={i} className="bg-slate-50 p-6 rounded-2xl border-l-4 border-emerald-500">
-                   <div className="flex justify-between items-start mb-2"><p className="text-lg text-slate-800 font-medium leading-relaxed pr-6">{ex.en}</p><button onClick={() => { podcastEngine.stop(); podcastEngine.speak(ex.en); }} className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-all flex-shrink-0"><Volume2 className="w-4 h-4" /></button></div>
+                   <div className="flex justify-between items-start mb-2"><p className="text-lg text-slate-800 font-medium leading-relaxed pr-6">{ex.en}</p><button onClick={() => { podcastEngine.speak(ex.en); }} className="p-1.5 rounded-lg bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-all flex-shrink-0"><Volume2 className="w-4 h-4" /></button></div>
                    <p className="text-slate-500 font-medium">{ex.zh}</p>
                 </div>
              ))}
@@ -384,7 +393,7 @@ const VocabularyModule = ({ groups, intensiveWords, masteredWords, visitedWords,
   );
 };
 
-// --- Dictation Module (Fixed Syntax Errors) ---
+// --- Dictation Module ---
 const DictationModule = ({ groups, wrongWords, setWrongWords }: any) => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [isReviewMode, setIsReviewMode] = useState(false);
@@ -471,7 +480,7 @@ const DictationModule = ({ groups, wrongWords, setWrongWords }: any) => {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-xl font-bold text-slate-800">{word.word}</h3>
-                    <button onClick={() => { podcastEngine.stop(); podcastEngine.speak(word.word); }} className="p-2 text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
+                    <button onClick={() => { podcastEngine.speak(word.word); }} className="p-2 text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
                       <Volume2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -532,7 +541,7 @@ const DictationModule = ({ groups, wrongWords, setWrongWords }: any) => {
           </div>
         </div>
         <div className="bg-white rounded-[3rem] p-10 md:p-16 shadow-xl border border-slate-50 text-center relative overflow-hidden">
-          <button onClick={() => { podcastEngine.stop(); podcastEngine.speak(currentWord.word); }} className="w-24 h-24 bg-emerald-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-xl shadow-emerald-100 active:scale-95 transition-transform">
+          <button onClick={() => { podcastEngine.speak(currentWord.word); }} className="w-24 h-24 bg-emerald-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-xl shadow-emerald-100 active:scale-95 transition-transform">
             <Volume2 className="w-10 h-10" />
           </button>
           <form onSubmit={handleCheck} className="space-y-8">
@@ -608,15 +617,14 @@ const DictationModule = ({ groups, wrongWords, setWrongWords }: any) => {
   );
 };
 
-// --- Article Detail Component (Ensures strict state isolation) ---
-const ArticleDetailView = ({ article, onBack }: any) => {
+// --- Article Detail Component ---
+// Forced re-mounting pattern used via "key" to ensure full resource cleanup on article switch.
+const ArticleDetailView = ({ article, onBack }: { article: Article; onBack: () => void; key?: React.Key }) => {
   const [activeParaIdx, setActiveParaIdx] = useState<number | null>(null);
-  const [isReadingFull, setIsReadingFull] = useState(false);
-  const isReadingFullRef = useRef(false);
+  const [showTranslationMap, setShowTranslationMap] = useState<Record<number, boolean>>({});
 
   const [paraStates, setParaStates] = useState<Record<number, {
     isRecording: boolean;
-    showTranslation: boolean;
     recordedUrl: string | null;
   }>>({});
 
@@ -624,58 +632,52 @@ const ArticleDetailView = ({ article, onBack }: any) => {
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
-  const updateState = (idx: number, patch: any) => {
+  // Hard stop everything on unmount (navigation / component switch)
+  useEffect(() => {
+    return () => {
+      podcastEngine.stop();
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current.src = "";
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, []);
+
+  const updateParaState = (idx: number, patch: any) => {
     setParaStates(prev => ({
       ...prev,
-      [idx]: { ...(prev[idx] || { isRecording: false, showTranslation: false, recordedUrl: null }), ...patch }
+      [idx]: { ...(prev[idx] || { isRecording: false, recordedUrl: null }), ...patch }
     }));
+  };
+
+  const toggleTranslation = (idx: number) => {
+    setShowTranslationMap(prev => ({ ...prev, [idx]: !prev[idx] }));
   };
 
   const stopAll = () => {
     podcastEngine.stop();
-    setIsReadingFull(false);
-    isReadingFullRef.current = false;
     setActiveParaIdx(null);
-    if (audioPlayerRef.current) audioPlayerRef.current.pause();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current.src = "";
+    }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         mediaRecorderRef.current.stop();
     }
   };
 
-  const handlePlayFull = async () => {
-    if (isReadingFull) {
-      stopAll();
-      return;
-    }
-    stopAll();
-    setIsReadingFull(true);
-    isReadingFullRef.current = true;
-    for (let i = 0; i < article.paragraphs.length; i++) {
-      if (!isReadingFullRef.current) break;
-      setActiveParaIdx(i);
-      await new Promise<void>(resolve => {
-        podcastEngine.speak(article.paragraphs[i].en, 0.95, 'female', () => resolve());
-      });
-      if (isReadingFullRef.current && i < article.paragraphs.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 400));
-      }
-    }
-    if (isReadingFullRef.current) {
-      setIsReadingFull(false);
-      isReadingFullRef.current = false;
-      setActiveParaIdx(null);
-    }
-  };
-
   const handlePlayPara = (idx: number, text: string) => {
-    if (activeParaIdx === idx && !isReadingFull) {
+    if (activeParaIdx === idx) {
       stopAll();
       return;
     }
     stopAll();
     setActiveParaIdx(idx);
     podcastEngine.speak(text, 0.95, 'female', () => {
-       if (!isReadingFullRef.current) setActiveParaIdx(null);
+       setActiveParaIdx(null);
     });
   };
 
@@ -695,10 +697,10 @@ const ArticleDetailView = ({ article, onBack }: any) => {
         mediaRecorderRef.current.onstop = () => {
             const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
             const url = URL.createObjectURL(blob);
-            updateState(idx, { recordedUrl: url, isRecording: false });
+            updateParaState(idx, { recordedUrl: url, isRecording: false });
         };
         mediaRecorderRef.current.start();
-        updateState(idx, { isRecording: true });
+        updateParaState(idx, { isRecording: true });
     } catch (err) { 
         console.error('Mic access denied:', err); 
     }
@@ -716,105 +718,115 @@ const ArticleDetailView = ({ article, onBack }: any) => {
     <div className="max-w-2xl mx-auto animate-fade-in pb-32">
       <audio ref={audioPlayerRef} className="hidden" />
       
-      {/* Navbar */}
-      <div className="flex items-center justify-between mb-12 px-2 sticky top-0 bg-[#f8fafc]/90 backdrop-blur-md z-20 py-4 border-b border-slate-100/50">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-slate-400 hover:text-slate-950 font-bold uppercase tracking-[0.2em] text-[10px] transition-all">
+      {/* Article Detail Header Controls */}
+      <div className="flex items-center justify-between mb-12 px-2 sticky top-0 bg-[#f8fafc]/95 backdrop-blur-md z-20 py-4 border-b border-slate-100/50">
+        <button onClick={() => { stopAll(); onBack(); }} className="flex items-center gap-1.5 text-slate-400 hover:text-slate-950 font-bold uppercase tracking-[0.2em] text-[9px] transition-all">
           <ChevronLeft className="w-3.5 h-3.5" /> Back
         </button>
-        <button 
-          onClick={handlePlayFull}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-full shadow-sm transition-all active:scale-95 ${
-            isReadingFull ? 'bg-rose-500 text-white' : 'bg-slate-900 text-white hover:bg-slate-800'
-          }`}
-        >
-          {isReadingFull ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-          <span className="text-[10px] font-black uppercase tracking-[0.1em]">{isReadingFull ? 'Stop' : '全文发音'}</span>
-        </button>
       </div>
 
-      {/* Header */}
       <div className="mb-14 px-6 text-center">
-        <h1 className="text-2xl md:text-4xl font-bold text-slate-950 mb-6 leading-[1.2] font-serif-magazine tracking-tight">
+        <h1 className="text-xl md:text-2xl font-bold text-slate-950 mb-4 leading-[1.4] font-serif-magazine tracking-tight">
           {article.title}
         </h1>
-        <p className="text-slate-500 text-base font-serif italic mb-8 leading-relaxed max-w-xl mx-auto opacity-80">
-          {article.subtitle}
+        <p className="text-slate-400 text-[13px] md:text-[14px] font-serif italic mb-8 leading-relaxed max-w-lg mx-auto opacity-90">
+          {article.titleZh}
         </p>
-        <div className="flex items-center justify-center gap-4 text-[9px] font-black uppercase tracking-widest text-slate-300">
-           <Clock className="w-3 h-3" /> {article.readingTime || '5 min read'}
+        <div className="flex items-center justify-center gap-4 text-[8px] font-black uppercase tracking-widest text-slate-300">
+           <Clock className="w-2.5 h-2.5" /> {article.readingTime || '5 min read'}
         </div>
-        <div className="h-px w-12 bg-slate-200 mx-auto mt-10"></div>
+        <div className="h-px w-10 bg-slate-200 mx-auto mt-10"></div>
       </div>
 
-      {/* Content */}
-      <div className="space-y-10 px-6">
-        {article.paragraphs.map((para: any, i: number) => {
-          const state = paraStates[i] || { isRecording: false, showTranslation: false, recordedUrl: null };
+      <div className="space-y-12 px-6">
+        {article.paragraphs.map((para, i) => {
+          const state = paraStates[i] || { isRecording: false, recordedUrl: null };
           const isActive = activeParaIdx === i;
+          const isTranslated = !!showTranslationMap[i];
+          
           return (
-            <div key={i} className="group relative flex flex-col md:flex-row gap-6 items-start">
-              <div className="order-1 md:order-2 flex flex-row md:flex-col gap-2 md:sticky md:top-32 w-full md:w-fit justify-center md:justify-start">
-                <button onClick={() => handlePlayPara(i, para.en)} className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${isActive && !state.isRecording ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-400 hover:text-emerald-600 border-slate-100'}`}>
-                  {isActive && !state.isRecording ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                </button>
-                <button onClick={() => handleRecord(i)} className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${state.isRecording ? 'bg-rose-500 text-white border-rose-500 animate-pulse' : 'bg-white text-slate-400 hover:text-rose-600 border-slate-100'}`}>
-                  <Mic className="w-3.5 h-3.5" />
-                </button>
-                <button disabled={!state.recordedUrl} onClick={() => handleCheckShadow(state.recordedUrl!)} className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${!state.recordedUrl ? 'opacity-20 cursor-not-allowed bg-slate-50 text-slate-200 border-transparent' : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50'}`}>
-                  <RotateCw className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              <div className="order-2 md:order-1 flex-1">
-                 <p className={`text-lg md:text-xl leading-[1.6] font-serif-magazine antialiased transition-colors duration-500 ${isActive ? 'text-slate-950 font-medium' : 'text-slate-700'}`}>
-                  {para.en}
-                </p>
-                <div className="mt-4">
-                  <button onClick={() => updateState(i, { showTranslation: !state.showTranslation })} className="mb-3 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 hover:text-slate-900 transition-all">
-                      {state.showTranslation ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />} {state.showTranslation ? 'Hide' : 'Translation'}
-                  </button>
-                  {state.showTranslation && (
-                      <div className="p-5 bg-slate-50/70 rounded-xl border-l border-slate-200 animate-fade-in">
-                          <p className="text-slate-500 text-base md:text-lg leading-[1.5] italic font-serif">{para.zh}</p>
-                      </div>
-                  )}
+            <div key={i} className="group flex flex-col gap-4">
+              <div className="flex gap-6 items-start">
+                <div className="flex-1">
+                   <p className={`text-[15px] md:text-[16px] leading-[1.6] font-serif-magazine antialiased transition-colors duration-500 ${isActive ? 'text-emerald-700 font-medium' : 'text-slate-700'}`}>
+                    {para.en}
+                  </p>
                 </div>
+                <div className="flex flex-col gap-2">
+                  <button onClick={() => handlePlayPara(i, para.en)} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${isActive && !state.isRecording ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-400 hover:text-emerald-600 border-slate-100'}`} title="发音">
+                    {isActive && !state.isRecording ? <Pause className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+                  </button>
+                  <button onClick={() => handleRecord(i)} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${state.isRecording ? 'bg-rose-500 text-white border-rose-500 animate-pulse' : 'bg-white text-slate-400 hover:text-rose-600 border-slate-100'}`} title="跟读">
+                    <Mic className="w-3 h-3" />
+                  </button>
+                  <button disabled={!state.recordedUrl} onClick={() => handleCheckShadow(state.recordedUrl!)} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all active:scale-95 shadow-sm border ${!state.recordedUrl ? 'opacity-20 cursor-not-allowed bg-slate-50 text-slate-200 border-transparent' : 'bg-white text-emerald-600 border-emerald-100 hover:bg-emerald-50'}`} title="回放">
+                    <RotateCw className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={() => toggleTranslation(i)} 
+                  className="w-fit flex items-center gap-1.5 text-slate-400 hover:text-emerald-600 font-bold uppercase tracking-[0.1em] text-[9px] transition-all bg-slate-100/50 px-2 py-1 rounded"
+                >
+                  {isTranslated ? <EyeOff className="w-2.5 h-2.5" /> : <Eye className="w-2.5 h-2.5" />}
+                  {isTranslated ? '隐藏中文翻译' : '查看中文翻译'}
+                </button>
+                {isTranslated && (
+                  <div className="animate-fade-in px-4 py-3 bg-emerald-50/50 rounded-xl border-l-2 border-emerald-200">
+                    <p className="text-slate-500 text-[14px] md:text-[15px] leading-[1.6] italic font-serif">{para.zh}</p>
+                  </div>
+                )}
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Keywords */}
-      <section className="mt-24 pt-12 border-t border-slate-200 px-6">
-        <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] mb-10 text-center italic">Key Words</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
-          {article.keywords.map((kw: any) => (
-            <div key={kw.word} className="flex items-center justify-between border-b border-slate-50 pb-5 group">
-              <div className="flex-1 pr-4">
-                <span className="font-bold text-slate-950 text-base block mb-0.5">{kw.word}</span>
-                <p className="text-xs text-slate-500 font-medium italic opacity-80">{kw.meaning}</p>
+      {article.source && (
+        <div className="mt-12 px-6 pt-6 border-t border-slate-100 text-center">
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] italic">来源：{article.source}</p>
+        </div>
+      )}
+
+      {article.keywords && article.keywords.length > 0 && (
+        <section className="mt-24 pt-12 border-t border-slate-200 px-6">
+          <h3 className="text-[8px] font-black text-slate-400 uppercase tracking-[0.4em] mb-10 text-center italic">Key Words</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+            {article.keywords.map((kw: any) => (
+              <div key={kw.word} className="flex items-center justify-between border-b border-slate-50 pb-5 group">
+                <div className="flex-1 pr-4">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="font-bold text-slate-950 text-[15px]">{kw.word}</span>
+                    {kw.ipa && <span className="text-[10px] text-emerald-600 font-mono font-medium">{kw.ipa}</span>}
+                  </div>
+                  <p className="text-[12px] text-slate-500 font-medium italic opacity-85">{kw.meaning}</p>
+                </div>
+                <button onClick={() => { stopAll(); podcastEngine.speak(kw.word); }} className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 hover:bg-slate-900 hover:text-white transition-all shadow-sm">
+                  <Volume2 className="w-3 h-3" />
+                </button>
               </div>
-              <button onClick={() => { podcastEngine.stop(); podcastEngine.speak(kw.word); }} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 hover:bg-slate-900 hover:text-white transition-all shadow-sm">
-                <Volume2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="text-center pt-20 pb-10">
-          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-2">Copyright Attribution</p>
-          <p className="text-xs text-slate-950 font-medium opacity-80">{article.source}</p>
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };
 
-// --- Reading Module (Main Logic) ---
-const ReadingModule = ({ articles }: any) => {
+// --- Reading Module ---
+const ReadingModule = ({ articles }: { articles: Article[] }) => {
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const selectedArticle = articles.find((a: any) => a.id === selectedArticleId);
 
+  // Strict hard stop of audio engine when switching context.
+  useEffect(() => {
+    podcastEngine.stop();
+  }, [selectedArticleId]);
+
   if (selectedArticleId && selectedArticle) {
+    // Component key is set to ID to force full re-mount on selection.
     return <ArticleDetailView key={selectedArticleId} article={selectedArticle} onBack={() => setSelectedArticleId(null)} />;
   }
 
@@ -831,16 +843,16 @@ const ReadingModule = ({ articles }: any) => {
             <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors" />
           </div>
           <div className="flex-1 px-7 py-7">
-            <h3 className="text-lg md:text-xl font-bold text-slate-950 mb-3 leading-tight tracking-tight font-serif-magazine group-hover:text-emerald-700 transition-colors">
+            <h3 className="text-[15px] md:text-[16px] font-bold text-slate-950 mb-3 leading-snug tracking-tight font-serif-magazine group-hover:text-emerald-700 transition-colors">
               {article.title}
             </h3>
-            <p className="text-slate-400 text-xs font-medium italic leading-relaxed mb-4">{article.titleZh}</p>
+            <p className="text-slate-400 text-[10px] md:text-[11px] font-medium italic leading-relaxed mb-4 line-clamp-1">{article.titleZh}</p>
             <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-widest text-slate-300">
-               <Clock className="w-3 h-3" /> {article.readingTime || '5 min read'}
+               <Clock className="w-2.5 h-2.5" /> {article.readingTime || '5 min read'}
             </div>
           </div>
-          <div className="mt-auto px-7 pb-7 pt-4 flex items-center text-slate-900 text-[9px] font-black uppercase tracking-[0.2em] group-hover:text-emerald-600 transition-colors">
-            Start Reading <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
+          <div className="mt-auto px-7 pb-7 pt-4 flex items-center text-slate-900 text-[8px] font-black uppercase tracking-[0.2em] group-hover:text-emerald-600 transition-colors">
+            Start Reading <ChevronRight className="w-2.5 h-2.5 ml-1 group-hover:translate-x-1 transition-transform" />
           </div>
         </button>
       ))}
